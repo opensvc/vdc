@@ -1,0 +1,9 @@
+[
+	{
+		"role": "trainees"
+	},
+	{
+		"role": "DnsOperator",
+		"privilege": true
+	}
+]

@@ -1,0 +1,95 @@
+[DEFAULT]
+app = INFRA
+env = PRD
+docker_data_dir = /srv/{svcname}/docker
+docker_daemon_args = --log-opt max-size=1m --insecure-registry 192.168.100.8
+rollback = false
+
+[disk#1]
+type = vg
+name = {svcname}
+pvs = {env.dev}
+
+[fs#1]
+type = btrfs
+mnt = /srv/{svcname}/docker
+dev = /dev/{svcname}/docker
+vg = {svcname}
+size = 4g
+mnt_opt = defaults,subvol=docker
+subset = fs1
+
+[fs#2]
+type = ext4
+mnt = /srv/{svcname}/data
+dev = /dev/{svcname}/data
+vg = {svcname}
+size = 100%FREE
+mnt_opt = defaults,rw
+subset = fs2
+
+[ip#0]
+type = docker
+ipdev = br-prd
+ipname = {env.ipname}
+netmask = {env.netmask}
+gateway = {env.gateway}
+container_rid = container#0
+dns_update = true
+
+[container#0]
+type = docker
+run_image = busybox
+run_args = -i -t --net=none
+run_command = /bin/sh
+
+[container#1]
+type = docker
+run_image = distribution/registry:master
+pre_provision = cp -a /data/opensvc/registry/nginx /data/opensvc/registry/registry /srv/{svcname}/data/
+run_args = --net=container:{svcname}.container.0
+	-v /etc/localtime:/etc/localtime:ro
+	-v /srv/{svcname}/data/registry/data:/var/lib/registry
+	-v /srv/{svcname}/data/registry/certs:/certs
+	-v /srv/{svcname}/data/registry/conf/config.yml:/etc/docker/registry/config.yml
+	-e REGISTRY_HTTP_ADDR=localhost:5000
+	-e REGISTRY_HTTP_HOST=https://{env.ipname}
+	-e REGISTRY_HTTP_SECRET={svcname}2016
+	-e REGISTRY_AUTH=token
+	-e REGISTRY_AUTH_TOKEN_REALM=https://{env.collector}/init/registry/token
+	-e REGISTRY_AUTH_TOKEN_SERVICE="registry"
+	-e REGISTRY_AUTH_TOKEN_ISSUER="opensvc"
+	-e REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE=/certs/server.crt
+	-e REGISTRY_STORAGE_DELETE_ENABLED=true
+	-e SSL_TRUST={env.collector}:443
+
+[container#2]
+type = docker
+run_image = nginx:latest
+run_args = --net=container:{svcname}.container.0
+	-v /etc/localtime:/etc/localtime:ro
+	-v /srv/{svcname}/data/nginx/conf/nginx.conf:/etc/nginx/conf.d/default.conf
+	-v /srv/{svcname}/data/nginx/conf/ssl:/etc/nginx/ssl
+
+[container#3]
+type = docker
+run_image = busybox:latest
+run_args = -i -t --net=container:{svcname}.container.0
+	-v /etc/localtime:/etc/localtime:ro
+run_command = /bin/sh
+
+[task#0]
+tags = gc
+blocking_pre_run = {svcmgr} -s {svcname} stop --rid container#2
+command = {svcmgr} -s {svcname} docker exec {svcname}.container.1 registry garbage-collect /etc/docker/registry/config.yml
+post_run = {svcmgr} -s {svcname} start --rid container#2
+schedule = @1440
+run_requires = container#1(up) ip#0(up)
+
+[env]
+dev = /dev/vdc
+ipname = 192.168.100.8
+netmask = 24
+gateway = 192.168.100.1
+collector = 192.168.100.9
+

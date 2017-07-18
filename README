@@ -1,0 +1,66 @@
+# network config
+sudo nmcli c show
+sudo nmcli d show
+sudo nmcli c add type bridge ifname br-prd con-name bridge-br-prd
+sudo nmcli c add type bridge ifname br-hb0 con-name bridge-br-hb0
+sudo nmcli c add type bridge ifname br-hb1 con-name bridge-br-hb1
+sudo nmcli c mod bridge-br-prd bridge.stp no
+sudo nmcli c mod bridge-br-hb0 bridge.stp no
+sudo nmcli c mod bridge-br-hb1 bridge.stp no
+sudo nmcli c mod bridge-br-prd ipv4.method auto
+sudo nmcli c mod bridge-br-hb0 ipv4.method link-local
+sudo nmcli c mod bridge-br-hb1 ipv4.method link-local
+sudo nmcli c add type ethernet ifname enp0s31f6 con-name enp0s31f6
+sudo nmcli c mod enp0s31f6 connection.master br-prd connection.slave-type bridge
+
+# zpool create
+zpool create -f data /dev/disk/by-id/wwn-0x5000c500a8f5c148 
+zpool add data cache /dev/disk/by-id/nvme-eui.0025385571b178e8-part3
+zpool add data log /dev/disk/by-id/nvme-eui.0025385571b178e8-part4
+
+# libvirt pool create
+mkdir -p /data/vdc/pool
+virsh pool-define-as vdc --type dir --target /data/vdc/pool
+virsh pool-start vdc
+
+# libvirt dnsmasq domain forwarding
+sudo virsh net-edit vagrant-libvirt
+# add:
+#  <dns>
+#    <forwarder domain='vdc.opensvc.com' addr='192.168.100.9'/>
+#  </dns>
+sudo virsh net-destroy vagrant-libvirt
+sudo virsh net-define /etc/libvirt/qemu/networks/vagrant-libvirt.xml
+sudo virsh net-start vagrant-libvirt
+
+# repos
+sudo apt install yum-utils createrepo
+sudo mkdir -p /data/vdc/share/repos/centos/7/{base,centosplus,extras,updates}
+cd /data/vdc/share/repos
+sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=base \
+  --newest-only --delete --downloadcomps --download-metadata \
+  --download_path=/data/vdc/share/repos/centos/7/
+sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=extras \
+  --newest-only --delete --downloadcomps --download-metadata \
+  --download_path=/data/vdc/share/repos/centos/7/
+sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=updates \
+  --newest-only --delete --downloadcomps --download-metadata \
+  --download_path=/data/vdc/share/repos/centos/7/
+sudo createrepo /data/vdc/share/repos/centos/7/base/ -g comps.xml
+sudo createrepo /data/vdc/share/repos/centos/7/extras/
+sudo createrepo /data/vdc/share/repos/centos/7/updates/
+
+
+# provision lab vm
+cd /data/vdc/build/lab
+vagrant up --no-parallel
+
+# unprovision lab vm
+cd /data/vdc/build/lab
+vagrant destroy
+
+# unprovision shared disks
+virsh vol-list --pool vdc | \
+	grep "/data/vdc/pool/lab_cluster.*img" | \
+	awk '{print $1}' | \
+	xargs -n1 virsh vol-delete --pool vdc --vol

@@ -1,0 +1,43 @@
+[
+	{
+		"name": "Vagrant Management",
+		"network": "192.168.121.0",
+		"gateway": "192.168.121.1",
+		"prio": 0,
+		"pvid": 0,
+		"netmask": 24
+	},
+	{
+		"name": "Hotspot VDC",
+		"network": "192.168.99.0",
+		"netmask": 24,
+		"prio": 0,
+		"pvid": 0,
+		"gateway": "192.168.99.1"
+	},
+	{
+		"name": "Production",
+		"network": "192.168.100.0",
+		"netmask": 24,
+		"gateway": "192.168.100.1",
+		"prio": 1,
+		"pvid": 0,
+		"team_responsible": "trainees"
+	},
+	{
+		"name": "Heartbeat 1",
+		"network": "192.168.101.0",
+		"netmask": 24,
+		"prio": 0,
+		"pvid": 0,
+		"team_responsible": "trainees"
+	},
+	{
+		"name": "Heartbeat 2",
+		"network": "192.168.102.0",
+		"netmask": 24,
+		"prio": 0,
+		"pvid": 0,
+		"team_responsible": "trainees"
+	}
+]

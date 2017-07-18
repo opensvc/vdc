@@ -1,0 +1,128 @@
+[DEFAULT]
+service_type = PRD
+monitor_action = freezestop
+
+[subset#app:02webservers]
+parallel = true
+
+[disk#0]
+type = lvm
+vgname = {svcname}
+scsireserv = true
+pvs = {env.dev}
+
+[subset#app:01appservers]
+parallel = false
+
+[ip#0]
+ipdev = br-prd
+restart = 1
+dns_update = true
+
+[hb#0]
+disable = True
+type = openha
+
+[fs#0]
+mnt = /srv/{svcname}
+type = ext3
+dev = /dev/{svcname}/root
+size = 100M
+vg = {svcname}
+
+[fs#1]
+mnt = /srv/{svcname}/app
+type = ext3
+dev = /dev/{svcname}/app
+size = 100M
+vg = {svcname}
+
+[fs#2]
+mnt = /srv/{svcname}/data
+type = ext3
+dev = /dev/{svcname}/data
+size = 100M
+vg = {svcname}
+
+[app#1]
+pre_provision = cp /data/opensvc/launcher/app /srv/{svcname}/app/dblauncher
+info = 10
+subset = 00database
+monitor = true
+script = /srv/{svcname}/app/dblauncher
+tags = groupdb
+stop = 90
+start = 10
+optional = true
+check = 10
+
+[app#2]
+pre_provision = cp /data/opensvc/launcher/app /srv/{svcname}/app/applauncher1
+info = 20
+subset = 01appservers
+script = /srv/{svcname}/app/applauncher1
+tags = groupapp
+stop = 80
+start = 20
+optional = false
+check = 20
+
+[app#3]
+pre_provision = cp /data/opensvc/launcher/app /srv/{svcname}/app/applauncher2
+info = 20
+subset = 01appservers
+script = /srv/{svcname}/app/applauncher2
+tags = groupapp
+stop = 80
+start = 20
+optional = false
+check = 20
+
+[app#4]
+info = 30
+pre_provision = cp /data/opensvc/launcher/app /srv/{svcname}/app/weblauncher1
+subset = 02webservers
+script = /srv/{svcname}/app/weblauncher1
+tags = groupweb
+stop = 70
+start = 30
+optional = false
+check = 30
+
+[app#5]
+pre_provision = cp /data/opensvc/launcher/app /srv/{svcname}/app/weblauncher2
+info = 30
+subset = 02webservers
+script = /srv/{svcname}/app/weblauncher2
+tags = groupweb
+stop = 70
+start = 30
+optional = false
+check = 30
+
+[app#6]
+pre_provision = cp /data/opensvc/launcher/app /srv/{svcname}/app/weblauncher3
+info = 30
+subset = 02webservers
+script = /srv/{svcname}/app/weblauncher3
+tags = groupweb
+stop = 70
+start = 30
+optional = false
+check = 30
+
+[app#7]
+pre_provision = cp /data/opensvc/launcher/app /srv/{svcname}/app/weblauncher4
+info = 30
+subset = 02webservers
+script = /srv/{svcname}/app/weblauncher4
+tags = groupweb
+stop = 70
+start = 30
+optional = false
+check = 30
+restart = 1
+
+[env]
+dev = /dev/vdc
+

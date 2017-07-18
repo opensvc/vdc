@@ -1,0 +1,114 @@
+[DEFAULT]
+docker_data_dir = /srv/{svcname}/docker
+docker_daemon_args = --log-opt max-size=1m
+
+[subset#fs:fs1]
+parallel = false
+
+[subset#fs:fs2]
+parallel = false
+
+[ip#0]
+ipdev = {env.bridge}
+ipname = {env.ipaddr}
+netmask = {env.netmask}
+gateway = {env.gateway}
+container_rid = container#0
+tags = docker
+
+[disk#1]
+type = vg
+name = {svcname}
+pvs = {env.dev}
+
+[fs#1]
+type = btrfs
+mnt = /srv/{svcname}/docker
+dev = /dev/{svcname}/docker
+vg = {svcname}
+size = 4g
+mnt_opt = defaults,subvol=docker
+subset = fs1
+
+[fs#2]
+type = ext4
+mnt = /srv/{svcname}/data
+dev = /dev/{svcname}/data
+vg = {svcname}
+size = 100%FREE
+mnt_opt = defaults,rw
+subset = fs2
+blocking_post_provision = mkdir -p /srv/{svcname}/data/web2py/applications; test -d /srv/{svcname}/data/web2py/applications/init || git clone https://git.opensvc.com/collector_eval/.git /srv/{svcname}/data/web2py/applications; chown -R {env.uid}:{env.gid} /srv/{svcname}/data/web2py/applications; cp /data/opensvc/collector/config.py /srv/{svcname}/data/web2py/applications/init/modules/config.py
+
+[container#0]
+type = docker
+run_image = registry.opensvc.com/busybox:latest
+run_args = -i -t
+        --net=none
+        -v /etc/localtime:/etc/localtime:ro
+run_command = /bin/sh
+
+[container#1]
+type = docker
+run_image = mariadb:10.3
+run_command = --bind-address=127.0.0.1
+run_args = -v /srv/{svcname}/data/db/conf:/etc/mysql/conf.d
+        -v /srv/{svcname}/data/web2py/applications/init/dbdump/schema.dump:/docker-entrypoint-initdb.d/01-schema.sql
+        -v /srv/{svcname}/data/web2py/applications/init/dbdump/data.dump:/docker-entrypoint-initdb.d/02-data.sql
+        -v /srv/{svcname}/data/db/data:/var/lib/mysql:rw
+        -v /etc/localtime:/etc/localtime:ro
+        --net=container:{svcname}.container.0
+        -e MYSQL_ROOT_PASSWORD=opensvc
+pre_provision = mkdir -p /srv/{svcname}/data/db/conf /srv/{svcname}/data/db/data
+
+[container#2]
+type = docker
+run_image = registry.opensvc.com/opensvc/collector_nginx:build2
+run_args = -i -t
+        -v /etc/localtime:/etc/localtime:ro
+        -v /srv/{svcname}/data/nginx/conf:/conf:rw
+        -v /srv/{svcname}/data/web2py/applications:/opt/web2py/applications:rw
+        -e SVCNAME={svcname}
+        --net=container:{svcname}.container.0
+pre_provision = mkdir -p /srv/{svcname}/data/nginx/conf
+
+[container#3]
+type = docker
+run_image = redis:3.2-alpine
+run_command = --bind 127.0.0.1
+run_args = -i -t
+        -v /etc/localtime:/etc/localtime:ro
+        --net=container:{svcname}.container.0
+
+[container#4]
+type = docker
+run_image = registry.opensvc.com/opensvc/collector_web2py:build12
+run_args = -i -t
+        -v /etc/localtime:/etc/localtime:ro
+        -v /srv/{svcname}/data/web2py/applications:/opt/web2py/applications:rw
+        -e CUSTO_UID={env.uid} -e CUSTO_GID={env.gid}
+        --net=container:{svcname}.container.0
+
+[container#5]
+type = docker
+run_image = elcweb/powerdns:latest
+run_args = --net=container:{svcname}.container.0
+        -v /etc/localtime:/etc/localtime:ro
+        -e PDNSCONF_API_KEY={svcname}.secret
+        -e PDNSCONF_MASTER=yes
+        -e PDNSCONF_DEFAULT_SOA_NAME=vdc.opensvc.com
+        -e PDNSCONF_GMYSQL_HOST=127.0.0.1
+        -e PDNSCONF_GMYSQL_DBNAME=pdns
+        -e PDNSCONF_GMYSQL_USER=pdns
+        -e PDNSCONF_GMYSQL_PASSWORD=pdns
+
+[env]
+datafile_dir = /srv
+bridge = br-prd
+ipaddr = 192.168.100.9
+netmask = 24
+gateway = 192.168.100.1
+uid = 1001
+gid = 1001
+dev = /dev/vdb
+

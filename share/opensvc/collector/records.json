@@ -1,0 +1,23 @@
+[
+	{
+		"name": "vdc.opensvc.com",
+		"type": "SOA",
+		"content": "192.168.100.9",
+		"ttl": 86400,
+		"domain_id": 7
+	},
+	{
+		"name": "collector.vdc.opensvc.com",
+		"type": "A",
+		"content": "192.168.100.9",
+		"ttl": 120,
+		"domain_id": 7
+	},
+	{
+		"name": "registry.vdc.opensvc.com",
+		"type": "A",
+		"content": "192.168.100.7",
+		"ttl": 120,
+		"domain_id": 7
+	}
+]

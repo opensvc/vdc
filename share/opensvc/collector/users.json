@@ -1,0 +1,62 @@
+[
+	{
+		"email": "user1@vdc.opensvc.com",
+		"first_name": "User",
+		"last_name": "1",
+		"password": "user1"
+	},
+	{
+		"email": "user2@vdc.opensvc.com",
+		"first_name": "User",
+		"last_name": "2",
+		"password": "user2"
+	},
+	{
+		"email": "user3@vdc.opensvc.com",
+		"first_name": "User",
+		"last_name": "3",
+		"password": "user3"
+	},
+	{
+		"email": "user4@vdc.opensvc.com",
+		"first_name": "User",
+		"last_name": "4",
+		"password": "user4"
+	},
+	{
+		"email": "user5@vdc.opensvc.com",
+		"first_name": "User",
+		"last_name": "5",
+		"password": "user5"
+	},
+	{
+		"email": "user6@vdc.opensvc.com",
+		"first_name": "User",
+		"last_name": "6",
+		"password": "user6"
+	},
+	{
+		"email": "user7@vdc.opensvc.com",
+		"first_name": "User",
+		"last_name": "7",
+		"password": "user7"
+	},
+	{
+		"email": "user8@vdc.opensvc.com",
+		"first_name": "User",
+		"last_name": "8",
+		"password": "user8"
+	},
+	{
+		"email": "user9@vdc.opensvc.com",
+		"first_name": "User",
+		"last_name": "9",
+		"password": "user9"
+	},
+	{
+		"email": "user10@vdc.opensvc.com",
+		"first_name": "User",
+		"last_name": "10",
+		"password": "user10"
+	}
+]

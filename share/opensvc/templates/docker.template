@@ -1,0 +1,47 @@
+[DEFAULT]
+app = INFRA
+env = PRD
+docker_data_dir = /srv/{svcname}/docker
+docker_daemon_args = --log-opt max-size=1m --insecure-registry=192.168.100.8 --insecure-registry=registry.infra --insecure-registry=registry.infra.vdc.opensvc.com
+rollback = false
+
+[disk#1]
+type = vg
+name = {svcname}
+pvs = {env.dev}
+
+[fs#1]
+type = btrfs
+mnt = /srv/{svcname}/docker
+dev = /dev/{svcname}/docker
+vg = {svcname}
+size = 500M
+mnt_opt = defaults,subvol=docker
+subset = fs1
+
+[fs#2]
+type = ext4
+mnt = /srv/{svcname}/data
+dev = /dev/{svcname}/data
+vg = {svcname}
+size = 100%FREE
+mnt_opt = defaults,rw
+subset = fs2
+
+[ip#0]
+type = docker
+ipdev = br-prd
+container_rid = container#0
+dns_update = true
+
+[container#0]
+type = docker
+run_image = {env.registry}/busybox:latest
+run_args = -i -t --net=none
+run_command = /bin/sh
+pre_provision = svcmgr -s {svcname} docker login %as_service% {env.registry}
+
+[env]
+dev = /dev/vdb
+registry = registry.infra
+

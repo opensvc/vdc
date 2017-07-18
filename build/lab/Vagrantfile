@@ -1,0 +1,80 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+hosts = {
+	  "node-1-1" => {
+		    "memory" => 1024,
+		    "cluster" => "cluster-1",
+	  },
+	  "node-1-2" => {
+		    "memory" => 1024,
+		    "cluster" => "cluster-1",
+	  },
+	  "node-2-1" => {
+		    "memory" => 1024,
+		    "cluster" => "cluster-2",
+	  },
+	  "node-2-2" => {
+		    "memory" => 1024,
+		    "cluster" => "cluster-2",
+	  },
+}
+
+Vagrant.configure("2") do |config|
+#	config.vm.synced_folder "../../sync", "/data", type: "rsync"
+	config.vm.synced_folder "../../share", "/data",
+		nfs: true,
+		mount_options: ['ro,actimeo=2']
+	config.vm.provision "shell", path: "../common/yum.sh"
+	config.vm.provision "shell", path: "../common/net.sh"
+	config.vm.provision "shell", path: "../common/ssh.sh"
+	config.vm.provision "shell", path: "../common/opensvc.sh"
+	hosts.each do |name, desc|
+		config.vm.define name do |machine|
+			machine.vm.box = "centos/7"
+			machine.vm.hostname = "%s.vdc.opensvc.com" % name
+			machine.vm.network :public_network,
+				:dev => "br-prd",
+				:mode => "bridge",
+				:type => "bridge"
+			machine.vm.network :public_network,
+				:dev => "br-hb0",
+				:mode => "bridge",
+				:type => "bridge"
+			machine.vm.network :public_network,
+				:dev => "br-hb1",
+				:mode => "bridge",
+				:type => "bridge"
+			machine.vm.provider "libvirt" do |v|
+				v.memory = desc["memory"]
+				v.storage_pool_name = "vdc"
+				v.volume_cache = "writeback"
+				#v.storage :file,
+				#	:device => :cdrom,
+				#	:path => '/data/vdc/iso/CentOS-7-x86_64-Everything-1611.iso'
+				v.storage :file,
+					:size => "1G",
+					:path => "lab_%s.disk1.img" % desc["cluster"],
+					:allow_existing => true,
+					:shareable => true,
+					:type => "raw",
+					:cache => "writeback"
+				v.storage :file,
+					:size => "1G",
+					:path => "lab_%s.disk2.img" % desc["cluster"],
+					:allow_existing => true,
+					:shareable => true,
+					:type => "raw",
+					:cache => "writeback"
+				v.storage :file,
+					:size => "1G",
+					:path => "lab_%s.disk3.img" % desc["cluster"],
+					:allow_existing => true,
+					:shareable => true,
+					:type => "raw",
+					:cache => "writeback"
+			end
+		end
+	end
+end
+

@@ -1,0 +1,70 @@
+#!/bin/bash
+
+[ -z "$OPENSVC_SVCNAME" ] && {
+	echo "OPENSVC_SVCNAME must be set" >&2
+	exit 1
+}
+
+NAME=$(basename $0)
+APP_D=$(dirname $0)
+DAEMON=${APP_D}/${NAME}.bin
+
+function create {
+	[ -x $DAEMON ] && return
+	cat - <<EOF >$DAEMON
+!#/bin/bash
+
+while true
+do
+	sleep 1
+done
+EOF
+	chmod +x $DAEMON
+}
+
+function status {
+        pgrep -f "$DAEMON">/dev/null 2>&1
+}
+
+function wait_for_down {
+        for i in 1 2 3 4 5
+	do
+		status || return 0
+		sleep 1
+	done
+	status || return 0
+	echo "still not down after 5 seconds" >&2
+	return 1
+}
+
+create
+
+case $1 in
+restart)
+        stop
+        start
+        ;;
+start)
+        status && {
+                echo "already started"
+                exit 0
+        }
+        nohup $DAEMON >/dev/null 2>&1 &
+        ;;
+stop)
+        pkill -f $DAEMON
+	wait_for_down
+        ;;
+info)
+        echo "Name: $DAEMON"
+        ;;
+status)
+        status
+        exit $?
+        ;;
+*)
+        echo "unsupported action: $1" >&2
+        exit 1
+        ;;
+esac
+
