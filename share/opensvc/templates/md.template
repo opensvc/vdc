@@ -1,0 +1,66 @@
+[DEFAULT]
+app = DOMNET
+rollback = false
+comment = bêh
+
+[ip#0]
+disable = True
+disable@flex_primary = false
+ipname = 128.1.11.1
+netmask = 32
+ipdev = lo
+
+[subset#disk:g1]
+parallel = false
+
+[subset#disk:g2]
+parallel = false
+
+[subset#disk:g3]
+parallel = false
+
+[disk#10]
+type = md
+subset = g1
+scsireserv = true
+level = raid1
+devs = {env.devs[0]} {env.devs[1]}
+uuid = 
+
+[disk#11]
+type = md
+subset = g2
+scsireserv = true
+level = raid1
+devs = {env.devs[2]} {env.devs[3]}
+uuid = 
+
+[disk#12]
+type = md
+subset = g3
+level = raid0
+devs = {disk#10.exposed_devs[0]} {disk#11.exposed_devs[0]}
+uuid = 
+
+[disk#30]
+type = vg
+vgname = {svcname}
+subset = g3
+pvs = {disk#12.exposed_devs[0]}
+
+[fs#01]
+dev = /dev/{svcname}/lv01
+mnt = /srv/{svcname}/lv01
+type = ext4
+size = 10m
+vg = {svcname}
+
+[env]
+owner = vagrant
+devs =
+	/dev/mapper/360000000000000000e00000000020001
+	/dev/mapper/360000000000000000e00000000010001
+	/dev/mapper/360000000000000000e0000000002000b
+	/dev/mapper/360000000000000000e0000000001000b
+
+
