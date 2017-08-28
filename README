@@ -7,7 +7,7 @@ sudo nmcli c add type bridge ifname br-hb1 con-name bridge-br-hb1
 sudo nmcli c mod bridge-br-prd bridge.stp no
 sudo nmcli c mod bridge-br-hb0 bridge.stp no
 sudo nmcli c mod bridge-br-hb1 bridge.stp no
-sudo nmcli c mod bridge-br-prd ipv4.method auto
+sudo nmcli c mod bridge-br-prd ipv4.method manual ipv4.addresses 192.168.100.1/24
 sudo nmcli c mod bridge-br-hb0 ipv4.method link-local
 sudo nmcli c mod bridge-br-hb1 ipv4.method link-local
 sudo nmcli c add type ethernet ifname enp0s31f6 con-name enp0s31f6
