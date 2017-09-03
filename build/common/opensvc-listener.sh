@@ -8,6 +8,7 @@ Description=OpenSVC collector-queued actions handler
 
 [Service]
 ExecStart=-/usr/bin/nodemgr dequeue actions
+RemainAfterExit=yes
 EOF
 
 cat - <<EOF >/etc/systemd/system/opensvc-actions.socket
