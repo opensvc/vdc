@@ -16,6 +16,7 @@ Vagrant.configure("2") do |config|
 	config.vm.provision "shell", path: "../common/net.sh"
 	config.vm.provision "shell", path: "../common/ssh.sh"
 	config.vm.provision "shell", path: "../common/md.sh"
+	config.vm.provision "shell", path: "../common/lvm.sh"
 	config.vm.provision "shell", path: "../common/opensvc.sh"
 	config.vm.provision "shell", path: "bootstrap.sh"
 	hosts.each do |name, desc|
