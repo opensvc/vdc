@@ -9,7 +9,7 @@ EOF
 
 cat - <<EOF >>/etc/lvm/lvm_$HOSTNAME.conf
 activation {
-    volume_list = ["@local", "@{node}"]
+    volume_list = ["@local", "@$HOSTNAME"]
 }
 EOF
 
