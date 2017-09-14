@@ -7,7 +7,7 @@ sudo yum-config-manager --add-repo file:///data/repos/centos/7/extras
 sudo yum-config-manager --add-repo file:///data/repos/centos/7/updates
 sudo yum-config-manager --setopt="gpgcheck=0" --save
 
-sudo yum install -y net-tools docker bridge-utils git runc wget bind-utils python-requests mdadm sg3_utils
+sudo yum install -y net-tools docker bridge-utils git runc wget bind-utils python-requests mdadm sg3_utils psmisc
 
 # bugfixes
 cd /usr/libexec/docker/
