@@ -18,6 +18,26 @@ hosts = {
 		    "memory" => 1024,
 		    "cluster" => "cluster-2",
 	  },
+	  "node-3-1" => {
+		    "memory" => 1024,
+		    "cluster" => "cluster-3",
+	  },
+	  "node-3-2" => {
+		    "memory" => 1024,
+		    "cluster" => "cluster-3",
+	  },
+	  "node-3-3" => {
+		    "memory" => 1024,
+		    "cluster" => "cluster-3",
+	  },
+          "node1" => {
+                    "memory" => 1024,
+                    "cluster" => "cluster-9",
+          },
+          "node2" => {
+                    "memory" => 1024,
+                    "cluster" => "cluster-9",
+          },
 }
 
 Vagrant.configure("2") do |config|
@@ -35,7 +55,7 @@ Vagrant.configure("2") do |config|
 	hosts.each do |name, desc|
 		config.vm.define name do |machine|
 			machine.vm.box = "centos/7"
-			machine.vm.hostname = "%s.vdc.opensvc.com" % name
+			machine.vm.hostname = "%s" % name
 			machine.vm.network :public_network,
 				:dev => "br-prd",
 				:mode => "bridge",
