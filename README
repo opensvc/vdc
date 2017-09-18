@@ -46,10 +46,13 @@ sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=ext
 sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=updates \
   --newest-only --delete --downloadcomps --download-metadata \
   --download_path=/data/vdc/share/repos/centos/7/
+sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=epel \
+  --newest-only --delete --downloadcomps --download-metadata \
+  --download_path=/data/vdc/share/repos/epel/7/
 sudo createrepo /data/vdc/share/repos/centos/7/base/ -g comps.xml
 sudo createrepo /data/vdc/share/repos/centos/7/extras/
 sudo createrepo /data/vdc/share/repos/centos/7/updates/
-
+sudo createrepo /data/vdc/share/repos/epel/7/
 
 # provision lab vm
 cd /data/vdc/build/lab
