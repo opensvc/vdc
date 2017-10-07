@@ -22,6 +22,7 @@ zpool add data log /dev/disk/by-id/nvme-eui.0025385571b178e8-part4
 mkdir -p /data/vdc/pool
 virsh pool-define-as vdc --type dir --target /data/vdc/pool
 virsh pool-start vdc
+virsh pool-autostart vdc
 
 # libvirt dnsmasq domain forwarding
 sudo virsh net-edit vagrant-libvirt
