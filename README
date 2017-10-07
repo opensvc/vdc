@@ -17,6 +17,10 @@ sudo nmcli c mod enp0s31f6 connection.master br-prd connection.slave-type bridge
 zpool create -f data /dev/disk/by-id/wwn-0x5000c500a8f5c148 
 zpool add data cache /dev/disk/by-id/nvme-eui.0025385571b178e8-part3
 zpool add data log /dev/disk/by-id/nvme-eui.0025385571b178e8-part4
+zfs create data/vdc
+zfs set canmount=noauto data/vdc
+mount -t zfs data/vdc /data
+cd /data & git clone git+ssh://opensvc@www.opensvc.com/home/opensvc/vdc
 
 # libvirt pool create
 mkdir -p /data/vdc/pool
