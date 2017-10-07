@@ -20,6 +20,7 @@ sudo yum install -y \
         mdadm \
         sg3_utils \
         psmisc \
+        iotop \
 	python-crypto \
         htop
 
