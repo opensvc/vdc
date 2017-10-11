@@ -29,5 +29,9 @@ node-9-3 37
 node-10-1 38
 node-10-2 39
 node-10-3 40
+xenial-1 80
+xenial-2 81
+deb-1 90
+deb-2 91
 node1 101
 node2 102

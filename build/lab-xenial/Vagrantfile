@@ -1,0 +1,85 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+hosts = {
+	  "xenial-1" => {
+		    "memory" => 1024,
+		    "cluster" => "cluster-1",
+	  },
+	  "xenial-2" => {
+		    "memory" => 1024,
+		    "cluster" => "cluster-1",
+	  },
+}
+
+Vagrant.configure("2") do |config|
+#	config.vm.synced_folder "../../sync", "/data", type: "rsync"
+	config.vm.synced_folder "../../share", "/data",
+		nfs: true,
+		mount_options: ['ro,actimeo=2']
+	config.vm.provision "shell", path: "../common/apt.sh"
+	config.vm.provision "shell", path: "../common/net.sh"
+	config.vm.provision "shell", path: "../common/ssh.sh"
+	config.vm.provision "shell", path: "../common/md.sh"
+	config.vm.provision "shell", path: "../common/lvm.sh"
+	config.vm.provision "shell", path: "../common/opensvc.sh"
+	config.vm.provision "shell", path: "../common/alias.sh"
+	hosts.each do |name, desc|
+		config.vm.define name do |machine|
+			machine.vm.box = "yk0/ubuntu-xenial"
+			machine.vm.hostname = "%s" % name
+			machine.vm.network :public_network,
+				:dev => "br-prd",
+				:mode => "bridge",
+				:type => "bridge",
+				:auto_config => false
+			machine.vm.network :public_network,
+				:dev => "br-hb0",
+				:mode => "bridge",
+				:type => "bridge",
+				:auto_config => false
+			machine.vm.network :public_network,
+				:dev => "br-hb1",
+				:mode => "bridge",
+				:type => "bridge",
+				:auto_config => false
+			machine.vm.provider "libvirt" do |v|
+				v.memory = desc["memory"]
+				v.storage_pool_name = "vdc"
+				v.volume_cache = "writeback"
+				#v.storage :file,
+				#	:device => :cdrom,
+				#	:path => '/data/vdc/iso/CentOS-7-x86_64-Everything-1611.iso'
+				v.storage :file,
+					:size => "10G",
+					:path => "lab_%s.disk1.img" % name,
+					:allow_existing => true,
+					:shareable => false,
+					:type => "raw",
+					:cache => "writeback"
+				v.storage :file,
+					:size => "2G",
+					:path => "lab_%s.disk2.img" % name,
+					:allow_existing => true,
+					:shareable => false,
+					:type => "raw",
+					:cache => "writeback"
+				v.storage :file,
+					:size => "2G",
+					:path => "lab_%s.disk3.img" % name,
+					:allow_existing => true,
+					:shareable => false,
+					:type => "raw",
+					:cache => "writeback"
+				v.storage :file,
+					:size => "2G",
+					:path => "lab_%s.disk4.img" % name,
+					:allow_existing => true,
+					:shareable => false,
+					:type => "raw",
+					:cache => "writeback"
+			end
+		end
+	end
+end
+

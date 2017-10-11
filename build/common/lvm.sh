@@ -13,5 +13,8 @@ activation {
 }
 EOF
 
-vgchange --addtag local VolGroup00
+if [ ! -f "/etc/debian_version" ]
+then
+	vgchange --addtag local VolGroup00
+fi
 
