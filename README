@@ -41,6 +41,8 @@ sudo virsh net-start vagrant-libvirt
 # repos
 sudo apt install yum-utils createrepo
 sudo mkdir -p /data/vdc/share/repos/centos/7/{base,centosplus,extras,updates}
+sudo mkdir -p /data/vdc/share/repos/epel/7
+sudo mkdir -p /data/vdc/share/repos/elrepo/7
 cd /data/vdc/share/repos
 sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=base \
   --newest-only --delete --downloadcomps --download-metadata \
@@ -54,10 +56,14 @@ sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=upd
 sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=epel \
   --newest-only --delete --downloadcomps --download-metadata \
   --download_path=/data/vdc/share/repos/epel/7/
+sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=elrepo \
+  --newest-only --delete --downloadcomps --download-metadata \
+  --download_path=/data/vdc/share/repos/elrepo/7/
 sudo createrepo /data/vdc/share/repos/centos/7/base/ -g comps.xml
 sudo createrepo /data/vdc/share/repos/centos/7/extras/
 sudo createrepo /data/vdc/share/repos/centos/7/updates/
 sudo createrepo /data/vdc/share/repos/epel/7/
+sudo createrepo /data/vdc/share/repos/elrepo/7/
 
 # provision lab vm
 cd /data/vdc/build/lab
