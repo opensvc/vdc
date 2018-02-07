@@ -2,42 +2,78 @@
 # vi: set ft=ruby :
 
 hosts = {
-	  "node-1-1" => {
-		    "memory" => 1024,
-		    "cluster" => "cluster-1",
-	  },
-	  "node-1-2" => {
-		    "memory" => 1024,
-		    "cluster" => "cluster-1",
-	  },
-	  "node-2-1" => {
-		    "memory" => 1024,
-		    "cluster" => "cluster-2",
-	  },
-	  "node-2-2" => {
-		    "memory" => 1024,
-		    "cluster" => "cluster-2",
-	  },
-	  "node-3-1" => {
-		    "memory" => 1024,
-		    "cluster" => "cluster-3",
-	  },
-	  "node-3-2" => {
-		    "memory" => 1024,
-		    "cluster" => "cluster-3",
-	  },
-	  "node-3-3" => {
-		    "memory" => 1024,
-		    "cluster" => "cluster-3",
-	  },
-          "node1" => {
-                    "memory" => 1024,
-                    "cluster" => "cluster-9",
-          },
-          "node2" => {
-                    "memory" => 1024,
-                    "cluster" => "cluster-9",
-          },
+	"node-1-1" => {
+		"memory" => 1024,
+		"cluster" => "cluster-1",
+	},
+	"node-1-2" => {
+		"memory" => 1024,
+		"cluster" => "cluster-1",
+	},
+	"node-2-1" => {
+		"memory" => 1024,
+		"cluster" => "cluster-2",
+	},
+	"node-2-2" => {
+		"memory" => 1024,
+		"cluster" => "cluster-2",
+	},
+	"node-3-1" => {
+		"memory" => 1024,
+		"cluster" => "cluster-3",
+	},
+	"node-3-2" => {
+		"memory" => 1024,
+		"cluster" => "cluster-3",
+	},
+	"node-4-1" => {
+		"memory" => 1024,
+		"cluster" => "cluster-4",
+	},
+	"node-4-2" => {
+		"memory" => 1024,
+		"cluster" => "cluster-4",
+	},
+	"node-5-1" => {
+		"memory" => 1024,
+		"cluster" => "cluster-5",
+	},
+	"node-5-2" => {
+		"memory" => 1024,
+		"cluster" => "cluster-5",
+	},
+	"node-6-1" => {
+		"memory" => 1024,
+		"cluster" => "cluster-6"
+	},
+	"node-6-2" => {
+		"memory" => 1024,
+		"cluster" => "cluster-6"
+	},
+	"node-7-1" => {
+		"memory" => 1024,
+		"cluster" => "cluster-7"
+	},
+	"node-7-2" => {
+		"memory" => 1024,
+		"cluster" => "cluster-7"
+	},	
+	"node-8-1" => {
+		"memory" => 1024,
+		"cluster" => "cluster-8"
+	},
+	"node-8-2" => {
+		"memory" => 1024,
+		"cluster" => "cluster-8"
+	},
+	"node-9-1" => {
+		"memory" => 1024,
+		"cluster" => "cluster-9"
+	},
+	"node-9-2" => {
+		"memory" => 1024,
+		"cluster" => "cluster-9"
+	},
 }
 
 Vagrant.configure("2") do |config|
@@ -52,7 +88,10 @@ Vagrant.configure("2") do |config|
 	config.vm.provision "shell", path: "../common/lvm.sh"
 	config.vm.provision "shell", path: "../common/opensvc.sh"
 	config.vm.provision "shell", path: "../common/opensvc-listener.sh"
+	config.vm.provision "shell", path: "../common/user.sh"
 	config.vm.provision "shell", path: "../common/alias.sh"
+	config.vm.provision "shell", path: "../common/selinux.sh"
+	config.vm.provision "shell", path: "../common/iscsi.sh"
 	hosts.each do |name, desc|
 		config.vm.define name do |machine|
 			machine.vm.box = "centos/7"
