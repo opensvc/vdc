@@ -19,6 +19,7 @@ sudo yum install -y \
         bind-utils \
         python-requests \
         mdadm \
+        mlocate \
         sg3_utils \
         psmisc \
         iotop \
