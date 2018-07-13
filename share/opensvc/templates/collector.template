@@ -14,7 +14,7 @@ ipname = {env.ipaddr}
 netmask = {env.netmask}
 gateway = {env.gateway}
 container_rid = container#0
-tags = docker
+type = docker
 
 [disk#1]
 type = vg
@@ -82,7 +82,7 @@ run_args = -i -t
 
 [container#4]
 type = docker
-run_image = registry.opensvc.com/opensvc/collector_web2py:build12
+run_image = registry.opensvc.com/opensvc/collector_web2py:build14
 run_args = -i -t
         -v /etc/localtime:/etc/localtime:ro
         -v /srv/{svcname}/data/web2py/applications:/opt/web2py/applications:rw
