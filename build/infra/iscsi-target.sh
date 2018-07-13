@@ -40,7 +40,7 @@ do
 
 done
 
-for cluster in $(cat $HOSTLIST | grep ^node-.-. | awk '{print $1}' | awk -F'-' '{print $2}'| sort -u)
+for cluster in $(cat $HOSTLIST | grep -E "^node-.*-.|^qatest.*-.*-." | awk '{print $1}' | awk -F'-' '{print $2}'| sort -u)
 do
 	# create quorum disk
 	[[ ! -f $DISKSREPO/cluster-$cluster.disk.quorum.img ]] && {
@@ -55,7 +55,7 @@ do
 	    }
 	done
 
-        for node in $(cat $HOSTLIST | grep ^node-$cluster-. | awk '{print $1}')
+        for node in $(cat $HOSTLIST | grep -E "^node-$cluster-.|^qatest.*-$cluster-." | awk '{print $1}')
         do
 	    for tgt in 1 2
 	    do
