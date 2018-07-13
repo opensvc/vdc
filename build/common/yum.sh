@@ -17,14 +17,13 @@ sudo yum install -y \
 	runc \
 	wget \
         bind-utils \
-        python-requests \
         mdadm \
         mlocate \
         sg3_utils \
         psmisc \
-        iotop \
-	python-crypto \
-        htop
+        iotop htop \
+        python-requests python-crypto \
+	python34 python34-requests python34-crypto
 
 # bugfixes
 cd /usr/libexec/docker/
