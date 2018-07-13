@@ -5,74 +5,92 @@ hosts = {
 	"node-1-1" => {
 		"memory" => 1024,
 		"cluster" => "cluster-1",
+                "sshexpose" => 22211
 	},
 	"node-1-2" => {
 		"memory" => 1024,
 		"cluster" => "cluster-1",
+                "sshexpose" => 22212
 	},
 	"node-2-1" => {
 		"memory" => 1024,
 		"cluster" => "cluster-2",
+                "sshexpose" => 22221
 	},
 	"node-2-2" => {
 		"memory" => 1024,
 		"cluster" => "cluster-2",
+                "sshexpose" => 22222
 	},
 	"node-3-1" => {
 		"memory" => 1024,
 		"cluster" => "cluster-3",
+                "sshexpose" => 22231
 	},
 	"node-3-2" => {
 		"memory" => 1024,
 		"cluster" => "cluster-3",
+                "sshexpose" => 22232
 	},
 	"node-4-1" => {
 		"memory" => 1024,
 		"cluster" => "cluster-4",
+                "sshexpose" => 22241
 	},
 	"node-4-2" => {
 		"memory" => 1024,
 		"cluster" => "cluster-4",
+                "sshexpose" => 22242
 	},
 	"node-5-1" => {
 		"memory" => 1024,
 		"cluster" => "cluster-5",
+                "sshexpose" => 22251
 	},
 	"node-5-2" => {
 		"memory" => 1024,
 		"cluster" => "cluster-5",
+                "sshexpose" => 22252
 	},
 	"node-6-1" => {
 		"memory" => 1024,
-		"cluster" => "cluster-6"
+		"cluster" => "cluster-6",
+                "sshexpose" => 22261
 	},
 	"node-6-2" => {
 		"memory" => 1024,
-		"cluster" => "cluster-6"
+		"cluster" => "cluster-6",
+                "sshexpose" => 22262
 	},
 	"node-7-1" => {
 		"memory" => 1024,
-		"cluster" => "cluster-7"
+		"cluster" => "cluster-7",
+                "sshexpose" => 22271
 	},
 	"node-7-2" => {
 		"memory" => 1024,
-		"cluster" => "cluster-7"
+		"cluster" => "cluster-7",
+                "sshexpose" => 22272
 	},	
 	"node-8-1" => {
 		"memory" => 1024,
-		"cluster" => "cluster-8"
+		"cluster" => "cluster-8",
+                "sshexpose" => 22281
 	},
 	"node-8-2" => {
 		"memory" => 1024,
-		"cluster" => "cluster-8"
+		"cluster" => "cluster-8",
+                "sshexpose" => 22282
 	},
 	"node-9-1" => {
 		"memory" => 1024,
-		"cluster" => "cluster-9"
+		"cluster" => "cluster-9",
+                "sshexpose" => 22291
 	},
 	"node-9-2" => {
 		"memory" => 1024,
-		"cluster" => "cluster-9"
+		"cluster" => "cluster-9",
+                "sshexpose" => 22292
 	},
 }
 
@@ -112,30 +130,18 @@ Vagrant.configure("2") do |config|
 				v.memory = desc["memory"]
 				v.storage_pool_name = "vdc"
 				v.volume_cache = "writeback"
+				config.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], host_ip: "192.168.1.42"
+				#
 				#v.storage :file,
 				#	:device => :cdrom,
 				#	:path => '/data/vdc/iso/CentOS-7-x86_64-Everything-1611.iso'
-				v.storage :file,
-					:size => "1G",
-					:path => "lab_%s.disk1.img" % desc["cluster"],
-					:allow_existing => true,
-					:shareable => true,
-					:type => "raw",
-					:cache => "writeback"
-				v.storage :file,
-					:size => "1G",
-					:path => "lab_%s.disk2.img" % desc["cluster"],
-					:allow_existing => true,
-					:shareable => true,
-					:type => "raw",
-					:cache => "writeback"
-				v.storage :file,
-					:size => "1G",
-					:path => "lab_%s.disk3.img" % desc["cluster"],
-					:allow_existing => true,
-					:shareable => true,
-					:type => "raw",
-					:cache => "writeback"
+				#v.storage :file,
+				#	:size => "1G",
+				#	:path => "lab_%s.disk1.img" % desc["cluster"],
+				#	:allow_existing => true,
+				#	:shareable => true,
+				#	:type => "raw",
+				#	:cache => "writeback"
 			end
 		end
 	end
