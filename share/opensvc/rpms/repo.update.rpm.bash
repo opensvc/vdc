@@ -1,18 +1,21 @@
 #!/bin/bash
 
-CMD="echo"
-
-[[ $1 == "run" ]] && {
-    CMD=""
-}
-
-
-TS=$(date +%Y%m%d%H%M%S)
-
 for ver in 1.8 1.9
 do
-    $CMD cp -pf current-${ver} ${TS}.${ver}
-    $CMD curl -o current-${ver} https://repo.opensvc.com/rpms/${ver}/current
-    $CMD ln -sf current-${ver} current-${ver}.rpm
+	test -d $ver || mkdir $ver
+	tmp=current.$ver.$$
+
+	# download latest branch release
+	curl -o $tmp https://repo.opensvc.com/rpms/${ver}/current
+
+	# extract the filename
+	fname=$(rpm -qp $tmp)
+
+	# move in the branch dir and rename to the extracted fname
+	mv -f $tmp $ver/$fname
+
+	# create the links used by "nodemgr updatepkg"
+	ln -sf $fname $ver/current
+	ln -sf $ver/$fname current-$ver
 done
 
