@@ -33,3 +33,12 @@ then
 	sudo cp /data/opensvc/registry/registry/certs/server.crt /etc/docker/certs.d/registry.infra/ca.crt
 	sudo cp /data/opensvc/registry/registry/certs/server.crt /etc/docker/certs.d/registry.infra.vdc.opensvc.com/ca.crt
 fi
+
+cat > /etc/opensvc/auth.conf <<EOF
+[freenas]
+type = freenas
+api = http://192.168.100.210/api/v1.0 
+username = root
+password = toto
+EOF
+
