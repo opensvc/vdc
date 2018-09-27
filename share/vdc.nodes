@@ -55,6 +55,7 @@ vipgobetween-cluster-13 115
 vipdemosvc1-cluster-13 116
 vipdemosvc7-cluster-13 117
 vipdemosvc8-cluster-13 118
+vipdemosvc5-cluster-13 119
 qates3centos7-50-1 120
 qatestcentos7-50-2 121
 qatestcentos7-50-3 122
@@ -75,3 +76,14 @@ qatestdeb-53-2 136
 qatestdeb-53-3 137
 qatestdeb-53-4 138
 qatestdeb-53-5 139
+rhel6-1-1 140
+rhel6-1-2 141
+rhel7-1-1 142
+rhel7-1-2 143
+osvpbogcrds01-rhel6-1 150
+osvpbogcrds01-rhel7-1 151
+gentoo-1 160
+gentoo-2 161
+tstdck-rhel7-1 152
+tstdrbd-rhel7-1 153
+infra-2 210
