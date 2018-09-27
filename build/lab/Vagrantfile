@@ -92,6 +92,11 @@ hosts = {
 		"cluster" => "cluster-9",
                 "sshexpose" => 22292
 	},
+	"node-9-3" => {
+		"memory" => 512,
+		"cluster" => "cluster-9",
+                "sshexpose" => 22293
+	},
 }
 
 Vagrant.configure("2") do |config|
@@ -110,6 +115,7 @@ Vagrant.configure("2") do |config|
 	config.vm.provision "shell", path: "../common/alias.sh"
 	config.vm.provision "shell", path: "../common/selinux.sh"
 	config.vm.provision "shell", path: "../common/iscsi.sh"
+	config.vm.provision "shell", path: "../common/drbd.sh"
 	hosts.each do |name, desc|
 		config.vm.define name do |machine|
 			machine.vm.box = "centos/7"
@@ -130,8 +136,8 @@ Vagrant.configure("2") do |config|
 				v.memory = desc["memory"]
 				v.storage_pool_name = "vdc"
 				v.volume_cache = "writeback"
-				config.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], host_ip: "192.168.1.42"
-				#
+				config.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], host_ip: "192.168.99.2"
+				config.vm.box_version = "1804.02"
 				#v.storage :file,
 				#	:device => :cdrom,
 				#	:path => '/data/vdc/iso/CentOS-7-x86_64-Everything-1611.iso'
