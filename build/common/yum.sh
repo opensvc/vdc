@@ -14,6 +14,8 @@ sudo yum install -y \
 	docker \
 	bridge-utils \
 	git \
+	jq \
+	links \
 	runc \
 	wget \
         bind-utils \
