@@ -72,10 +72,13 @@ sudo nmcli c show
 echo
 echo
 
-sudo nmcli c add type bridge ifname br-prd con-name bridge-br-prd
-sudo nmcli c mod bridge-br-prd bridge.stp no
-sudo nmcli c mod bridge-br-prd ipv4.method manual ipv4.addresses 192.168.100.$i/24
-sudo nmcli c mod bridge-br-prd ipv4.routes "192.168.99.0/24 192.168.100.1"
+bridge=bridge-br-prd
+nmcli c show | grep -q $bridge || {
+	sudo nmcli c add type bridge ifname br-prd con-name $bridge
+	sudo nmcli c mod $bridge bridge.stp no
+	sudo nmcli c mod $bridge ipv4.method manual ipv4.addresses 192.168.100.$i/24
+	sudo nmcli c mod $bridge ipv4.routes "192.168.99.0/24 192.168.100.1"
+}
 
 sudo nmcli c mod $ETH0 ipv4.method auto
 sudo nmcli c mod $ETH1 connection.master br-prd connection.slave-type bridge
