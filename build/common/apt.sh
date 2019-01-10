@@ -18,7 +18,6 @@ sudo apt install -y \
 	sg3-utils \
 	psmisc \
 	iotop \
-        docker.io \
 	links \
 	runc \
         sg3-utils \
