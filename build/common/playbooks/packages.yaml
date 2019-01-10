@@ -1,0 +1,76 @@
+---
+- hosts: all
+  become: true
+  remote_user: root
+
+  tasks:
+  - name: install common packages for all distros
+    apt:
+      update_cache=yes
+      state=latest
+      name={{item}}
+    with_items:
+    - ansible
+    - bridge-utils
+    - git
+    - htop
+    - iotop
+    - jq
+    - links
+    - lvm2
+    - mdadm
+    - mlocate
+    - net-tools
+    - psmisc
+    - python-crypto
+    - python-requests
+    - runc
+    - wget
+
+  - name: install common packages for ubuntu/deb
+    apt:
+      update_cache=yes
+      state=latest
+      name={{item}}
+    with_items:
+    - dnsutils
+    - multipath-tools
+    - network-manager
+    - open-iscsi
+    - python3-crypto
+    - python3-requests
+    - sg3-utils
+    when: (ansible_facts['distribution'] == "Ubuntu" ) or
+          (ansible_facts['distribution'] == "Debian" )
+
+  - name: install docker package for ubuntu
+    apt:
+      update_cache=yes
+      state=latest
+      name={{item}}
+    with_items:
+    - docker.io
+    when: (ansible_facts['distribution'] == "Ubuntu" )
+
+  - name: install docker package for debian
+    apt:
+      update_cache=yes
+      state=latest
+      name={{item}}
+    with_items:
+    - docker
+    when: (ansible_facts['distribution'] == "Debian" )
+
+  - name: install common packages for rhel/centos/fedora
+    yum:
+      update_cache=yes
+      state=latest
+      name={{item}}
+    with_items:
+    - bind-utils
+    - device-mapper-multipath
+    - iscsi-initiator-utils
+    - net-tools
+    - sg3_utils
+    when: (ansible_facts['distribution'] == "CentOS" ) or
+          (ansible_facts['distribution'] == "RHEL" )
