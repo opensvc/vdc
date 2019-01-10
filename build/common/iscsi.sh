@@ -6,9 +6,6 @@ echo "Iscsi setup"
 # Freenas
 ISCSITGT="192.168.100.210"
 
-# install packages
-sudo ansible-playbook /data/playbooks/iscsi.yaml
-
 cat - <<EOF >|/etc/multipath.conf
 defaults {
 	user_friendly_names no
