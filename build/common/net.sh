@@ -34,6 +34,14 @@ do
 	echo ETH$i=${!varname}
 done
 
+for nic in 1 2 3
+do
+	varname=ETH$i
+	# needed for nmcli debian, to list device associated to connections
+	ip link set ${!varname} down
+	ip link set ${!varname} up
+done
+
 # from here we have identified 4 nics defined in ETH0/1/2/3
 
 # override unmanaged-devices=* in /usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf
@@ -62,7 +70,7 @@ echo
 
 for nic in $ETH0 $ETH1 $ETH2 $ETH3
 do
-    uuid=$(nmcli -t c show | grep $nic | awk -F':' '{print $2}')
+    uuid=$(nmcli -t --fields name,uuid,device c show | grep $nic | awk -F':' '{print $2}')
     nmcli c modify uuid $uuid connection.id $nic
 done
 
