@@ -5,12 +5,11 @@
 
   tasks:
   - name: install common packages for all distros
-    apt:
+    package:
       update_cache=yes
       state=latest
       name={{item}}
     with_items:
-    - ansible
     - bridge-utils
     - git
     - htop
@@ -71,6 +70,9 @@
     - device-mapper-multipath
     - iscsi-initiator-utils
     - net-tools
+    - python34
+    - python34-crypto
+    - python34-requests
     - sg3_utils
     when: (ansible_facts['distribution'] == "CentOS" ) or
           (ansible_facts['distribution'] == "RHEL" )
