@@ -34,6 +34,14 @@ do
 	echo ETH$i=${!varname}
 done
 
+for nic in 1 2 3
+do
+	varname=ETH$i
+	# needed for nmcli debian, to list device associated to connections
+	ip link set ${!varname} down
+	ip link set ${!varname} up
+done
+
 # from here we have identified 4 nics defined in ETH0/1/2/3
 
 # override unmanaged-devices=* in /usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf
@@ -62,7 +70,7 @@ echo
 
 for nic in $ETH0 $ETH1 $ETH2 $ETH3
 do
-    uuid=$(nmcli -t c show | grep $nic | awk -F':' '{print $2}')
+    uuid=$(nmcli -t --fields name,uuid,device c show | grep $nic | awk -F':' '{print $2}')
     nmcli c modify uuid $uuid connection.id $nic
 done
 
@@ -72,10 +80,13 @@ sudo nmcli c show
 echo
 echo
 
-sudo nmcli c add type bridge ifname br-prd con-name bridge-br-prd
-sudo nmcli c mod bridge-br-prd bridge.stp no
-sudo nmcli c mod bridge-br-prd ipv4.method manual ipv4.addresses 192.168.100.$i/24
-sudo nmcli c mod bridge-br-prd ipv4.routes "192.168.99.0/24 192.168.100.1"
+bridge=bridge-br-prd
+nmcli c show | grep -q $bridge || {
+	sudo nmcli c add type bridge ifname br-prd con-name $bridge
+	sudo nmcli c mod $bridge bridge.stp no
+	sudo nmcli c mod $bridge ipv4.method manual ipv4.addresses 192.168.100.$i/24
+	sudo nmcli c mod $bridge ipv4.routes "192.168.99.0/24 192.168.100.1"
+}
 
 sudo nmcli c mod $ETH0 ipv4.method auto
 sudo nmcli c mod $ETH1 connection.master br-prd connection.slave-type bridge

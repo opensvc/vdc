@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "QAbot key setup"
+
 [[ ! -d /root/.ssh ]] && mkdir /root/.ssh
 
 cat - <<EOF >>/root/.ssh/authorized_keys
