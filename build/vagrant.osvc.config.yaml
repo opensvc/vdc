@@ -1,0 +1,17 @@
+---
+configs:
+    use: 'cvi'
+    avn:
+        iscsitgtip: '192.168.1.99'
+        vdcboxip: '192.168.1.2'
+        vdcboxexport: '/data/vdc/share'
+        vmautofsroot: '/autofs'
+        vmautofskey: 'data'
+        vmnfsroot: '/autofs/data'
+    cvi:
+        iscsitgtip: '192.168.100.210'
+        vdcboxip: '192.168.99.2'
+        vdcboxexport: '/data/vdc/share'
+        vmautofsroot: '/autofs'
+        vmautofskey: 'data'
+        vmnfsroot: '/autofs/data'
