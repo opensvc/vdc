@@ -2,6 +2,14 @@
 
 # systemctl status nfs-mountd.service
 
+grep -q ' /data nfs' /proc/mounts && {
+	umount /data && rmdir /data
+}
+
+grep -q '/data/vdc/share /mnt nfs' /proc/mounts && {
+	umount /mnt
+}
+
 cat - <<EOF >|/etc/auto.master.d/osvcdata.autofs
 ${VMAUTOFSROOT}    /etc/auto.osvcdata    --ghost,--timeout=30
 EOF
