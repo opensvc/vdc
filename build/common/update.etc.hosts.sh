@@ -4,8 +4,8 @@ INVENTORY="/data/vdc/share/vdc.nodes"
 
 declare -A subnets
 subnets["192.168.100"]=""
-subnets["192.168.101"]="-hb1"
-subnets["192.168.102"]="-hb2"
+subnets["192.168.101"]="-hb0"
+subnets["192.168.102"]="-hb1"
 
 [[ ! -f $INVENTORY ]] && {
 	echo "error: vdc.nodes is missing. exiting"
