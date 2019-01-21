@@ -61,7 +61,8 @@ sudo systemctl -q is-active $UNIT || sudo systemctl restart $UNIT || /bin/true
 sleep $SLEEP
 
 node=$(hostname -s)
-i=$(grep $node /data/vdc.nodes | awk '{print $2}')
+#i=$(grep $node /data/vdc.nodes | awk '{print $2}')
+i=$(getent -s dns hosts $node|awk '{print $1}'|awk -F'.' '{print $4}')
 
 echo
 echo "# before nmcli renaming"
