@@ -15,7 +15,7 @@ tags {
 EOF
 }
 
-grep -q volume_list /etc/lvm/lvm_$HOSTNAME.conf || {
+grep -q volume_list /etc/lvm/lvm_$HOSTNAME.conf >> /dev/null 2>&1 || {
 cat - <<EOF >>/etc/lvm/lvm_$HOSTNAME.conf
 activation {
     volume_list = ["@local", "@$HOSTNAME"]
