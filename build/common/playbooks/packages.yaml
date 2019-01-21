@@ -4,7 +4,7 @@
   remote_user: root
 
   tasks:
-  - name: install common packages for all distros
+  - name: install common packages for all distros (stage 1)
     package:
       update_cache=yes
       state=latest
@@ -12,9 +12,7 @@
     with_items:
     - bridge-utils
     - git
-    - htop
     - iotop
-    - jq
     - links
     - lvm2
     - mdadm
@@ -26,53 +24,79 @@
     - runc
     - wget
 
+  - name: install epel channel for rhel/centos/fedora
+    yum:
+      name:  "{{ packages }}"
+      state: present
+      update_cache:  yes
+    vars:
+      packages:
+        - epel-release
+    when: (ansible_facts['distribution'] == "CentOS" ) or
+          (ansible_facts['distribution'] == "RHEL" )
+
   - name: install common packages for ubuntu/deb
     apt:
-      update_cache=yes
-      state=latest
-      name={{item}}
-    with_items:
-    - dnsutils
-    - multipath-tools
-    - network-manager
-    - open-iscsi
-    - python3-crypto
-    - python3-requests
-    - sg3-utils
+      name:  "{{ packages }}"
+      state: present
+      update_cache:  yes
+    vars:
+      packages:
+        - dnsutils
+        - multipath-tools
+        - network-manager
+        - open-iscsi
+        - python3-crypto
+        - python3-requests
+        - sg3-utils
     when: (ansible_facts['distribution'] == "Ubuntu" ) or
           (ansible_facts['distribution'] == "Debian" )
 
   - name: install docker package for ubuntu
     apt:
-      update_cache=yes
-      state=latest
-      name={{item}}
-    with_items:
-    - docker.io
+      name:  "{{ packages }}"
+      state: present
+      update_cache:  yes
+    vars:
+      packages:
+        - docker.io
     when: (ansible_facts['distribution'] == "Ubuntu" )
 
   - name: install docker package for debian
     apt:
-      update_cache=yes
-      state=latest
-      name={{item}}
-    with_items:
-    - docker
+      name:  "{{ packages }}"
+      state: present
+      update_cache:  yes
+    vars:
+      packages:
+        - docker
     when: (ansible_facts['distribution'] == "Debian" )
 
   - name: install common packages for rhel/centos/fedora
     yum:
+      name:  "{{ packages }}"
+      state: present
+      update_cache:  yes
+    vars:
+      packages:
+        - autofs
+        - bind-utils
+        - device-mapper-multipath
+        - iscsi-initiator-utils
+        - net-tools
+        - nfs-utils
+        - python34
+        - python34-crypto
+        - python34-requests
+        - sg3_utils
+    when: (ansible_facts['distribution'] == "CentOS" ) or
+          (ansible_facts['distribution'] == "RHEL" )
+
+  - name: install common packages for all distros (stage 2)
+    package:
       update_cache=yes
       state=latest
       name={{item}}
     with_items:
-    - bind-utils
-    - device-mapper-multipath
-    - iscsi-initiator-utils
-    - net-tools
-    - python34
-    - python34-crypto
-    - python34-requests
-    - sg3_utils
-    when: (ansible_facts['distribution'] == "CentOS" ) or
-          (ansible_facts['distribution'] == "RHEL" )
+    - htop
+    - jq
