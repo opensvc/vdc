@@ -1,114 +1,197 @@
 [DEFAULT]
-docker_data_dir = /srv/{svcname}/docker
-docker_daemon_args = --log-opt max-size=1m
+orchestrate = ha
 
-[subset#fs:fs1]
-parallel = false
+[subset#container:data]
+parallel = true
 
-[subset#fs:fs2]
-parallel = false
+[subset#container:front]
+parallel = true
 
 [ip#0]
-ipdev = {env.bridge}
-ipname = {env.ipaddr}
-netmask = {env.netmask}
-gateway = {env.gateway}
-container_rid = container#0
-type = docker
+type = cni
+netns = container#0
 
-[disk#1]
-type = vg
-name = {svcname}
-pvs = {env.dev}
-
-[fs#1]
-type = btrfs
-mnt = /srv/{svcname}/docker
-dev = /dev/{svcname}/docker
-vg = {svcname}
-size = 4g
-mnt_opt = defaults,subvol=docker
-subset = fs1
-
-[fs#2]
-type = ext4
-mnt = /srv/{svcname}/data
-dev = /dev/{svcname}/data
-vg = {svcname}
-size = 100%FREE
-mnt_opt = defaults,rw
-subset = fs2
-blocking_post_provision = mkdir -p /srv/{svcname}/data/web2py/applications; test -d /srv/{svcname}/data/web2py/applications/init || git clone https://git.opensvc.com/collector_eval/.git /srv/{svcname}/data/web2py/applications; chown -R {env.uid}:{env.gid} /srv/{svcname}/data/web2py/applications; cp /data/opensvc/collector/config.py /srv/{svcname}/data/web2py/applications/init/modules/config.py
+[volume#0]
+name = {svcname}-data
+size = 12g
 
 [container#0]
 type = docker
-run_image = registry.opensvc.com/busybox:latest
-run_args = -i -t
-        --net=none
-        -v /etc/localtime:/etc/localtime:ro
-run_command = /bin/sh
+image = google/pause
+rm = true
 
 [container#1]
 type = docker
-run_image = mariadb:10.3
-run_command = --bind-address=127.0.0.1
-run_args = -v /srv/{svcname}/data/db/conf:/etc/mysql/conf.d
-        -v /srv/{svcname}/data/web2py/applications/init/dbdump/schema.dump:/docker-entrypoint-initdb.d/01-schema.sql
-        -v /srv/{svcname}/data/web2py/applications/init/dbdump/data.dump:/docker-entrypoint-initdb.d/02-data.sql
-        -v /srv/{svcname}/data/db/data:/var/lib/mysql:rw
-        -v /etc/localtime:/etc/localtime:ro
-        --net=container:{svcname}.container.0
-        -e MYSQL_ROOT_PASSWORD=opensvc
-pre_provision = mkdir -p /srv/{svcname}/data/db/conf /srv/{svcname}/data/db/data
+image = {env.app_image}
+netns = container#0
+rm = true
+detach = false
+volume_mounts = /etc/localtime:/etc/localtime:ro {volume#0.name}:/volume
+start_timeout = 5m
+entrypoint = /bin/bash
+run_command = -c 'mkdir -p /volume/data/db /volume/conf/db /volume/conf/nginx /volume/data/web2py/applications; test -d /volume/data/web2py/applications/init || (rm -rf /volume/data/web2py/applications/admin; git clone https://git.opensvc.com/collector_eval/.git /volume/data/web2py/applications && chown -R {env.uid}:{env.gid} /volume/data/web2py/applications && mkdir -p /volume/data/web2py/applications/init/modules && touch /volume/data/web2py/applications/init/modules/config.py)'
 
-[container#2]
+[container#db]
 type = docker
-run_image = registry.opensvc.com/opensvc/collector_nginx:build2
-run_args = -i -t
-        -v /etc/localtime:/etc/localtime:ro
-        -v /srv/{svcname}/data/nginx/conf:/conf:rw
-        -v /srv/{svcname}/data/web2py/applications:/opt/web2py/applications:rw
-        -e SVCNAME={svcname}
-        --net=container:{svcname}.container.0
-pre_provision = mkdir -p /srv/{svcname}/data/nginx/conf
+image = mariadb:10.4
+restart = 1
+rm = true
+netns = container#0
+volume_mounts = /etc/localtime:/etc/localtime:ro
+	{volume#0.name}/conf/db:/etc/mysql/conf.d
+	{volume#0.name}/data/db:/var/lib/mysql:rw
+        {volume#0.name}/data/web2py/applications/init/dbdump/schema.dump:/docker-entrypoint-initdb.d/01-schema.sql
+        {volume#0.name}/data/web2py/applications/init/dbdump/data.dump:/docker-entrypoint-initdb.d/02-data.sql
+run_args = -e MYSQL_ROOT_PASSWORD=opensvc
+subset = data
 
-[container#3]
+[container#nginx]
 type = docker
-run_image = redis:3.2-alpine
+image = registry.opensvc.com/opensvc/collector_nginx:build1
+volume_mounts = /etc/localtime:/etc/localtime:ro
+	{volume#0.name}/conf/nginx:/conf:rw
+	{volume#0.name}/data/web2py/applications:/opt/web2py/applications:rw
+run_args = -e SVCNAME={svcname}
+netns = container#0
+interactive = true
+tty = true
+restart = 1
+rm = true
+subset = front
+
+[container#redis]
+type = docker
+image = redis:5.0.1-alpine
 run_command = --bind 127.0.0.1
-run_args = -i -t
-        -v /etc/localtime:/etc/localtime:ro
-        --net=container:{svcname}.container.0
+volume_mounts = /etc/localtime:/etc/localtime:ro
+netns = container#0
+restart = 1
+rm = true
+subset = data
 
-[container#4]
+[container#uwsgi]
 type = docker
-run_image = registry.opensvc.com/opensvc/collector_web2py:build14
-run_args = -i -t
-        -v /etc/localtime:/etc/localtime:ro
-        -v /srv/{svcname}/data/web2py/applications:/opt/web2py/applications:rw
-        -e CUSTO_UID={env.uid} -e CUSTO_GID={env.gid}
-        --net=container:{svcname}.container.0
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = /usr/bin/uwsgi --buffer-size=32768 --plugin=python --socket=:8001 --pythonpath=/opt/web2py/ --mount=/=wsgihandler:application --master --processes=4 --harakiri=60 --reload-mercy=8 --cpu-affinity=1 --max-requests=500 --limit-as=4096 --reload-on-as=2048 --reload-on-rss=2048 --uid={env.uid} --gid={env.gid} --no-orphans
+subset = front
 
-[container#5]
+[container#comet]
 type = docker
-run_image = elcweb/powerdns:latest
-run_args = --net=container:{svcname}.container.0
-        -v /etc/localtime:/etc/localtime:ro
-        -e PDNSCONF_API_KEY={svcname}.secret
-        -e PDNSCONF_MASTER=yes
-        -e PDNSCONF_DEFAULT_SOA_NAME=vdc.opensvc.com
-        -e PDNSCONF_GMYSQL_HOST=127.0.0.1
-        -e PDNSCONF_GMYSQL_DBNAME=pdns
-        -e PDNSCONF_GMYSQL_USER=pdns
-        -e PDNSCONF_GMYSQL_PASSWORD=pdns
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/applications/init/comet/comet_messaging.py -p 8889 -k magix123
+subset = front
+
+[container#scheduler]
+type = docker
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/web2py.py -v -K init,init:janitor,init:metrics,init:slow
+subset = front
+
+[container#actiond]
+type = docker
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/applications/init/actiond/actiond.py -f
+subset = front
+
+[container#alertd]
+type = docker
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/applications/init/alertd/alertd.py -f
+subset = front
+
+[container#rq_svcmon]
+type = docker
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/web2py.py -S feed/default/task_rq_svcmon
+subset = front
+
+[container#rq_svcactions]
+type = docker
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/web2py.py -S feed/default/task_rq_svcactions
+subset = front
+
+[container#rq_generic]
+type = docker
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/web2py.py -S feed/default/task_rq_generic
+subset = front
+
+[container#rq_storage]
+type = docker
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/web2py.py -S feed/default/task_rq_storage
+subset = front
+
+[container#rq_dashboard]
+type = docker
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/web2py.py -S feed/default/task_rq_dashboard
+subset = front
+
+[container#rq_form_submit]
+type = docker
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/web2py.py -S init/rest/task_rq_form_submit
+subset = front
+
+[container#rq_async]
+type = docker
+image = {env.app_image}
+netns = container#0
+restart = 1
+rm = true
+volume_mounts = {env.app_mount}
+run_command = python /opt/web2py/web2py.py -S init/rest/task_rq_async
+subset = front
 
 [env]
-datafile_dir = /srv
-bridge = br-prd
-ipaddr = 192.168.100.9
-netmask = 24
-gateway = 192.168.100.1
-uid = 1001
-gid = 1001
-dev = /dev/vdb
+app_mount = /etc/localtime:/etc/localtime:ro {volume#0.name}/data/web2py/applications:/opt/web2py/applications:rw
+app_image = registry.opensvc.com/opensvc/collector_web2py:build17
+uid = 1000
+gid = 1000
 
