@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -a 
+set -a
 
 SLEEP=10
 
@@ -34,7 +34,7 @@ do
 	echo ETH$i=${!varname}
 done
 
-for nic in 1 2 3
+for i in 1 2 3
 do
 	varname=ETH$i
 	# needed for nmcli debian, to list device associated to connections
@@ -57,13 +57,15 @@ else
 	UNIT=network
 fi
 
-sudo systemctl -q is-active $UNIT || sudo systemctl restart $UNIT || /bin/true
+sudo systemctl restart $UNIT || /bin/true
 sleep $SLEEP
 
 node=$(hostname -s)
 #i=$(grep $node /data/vdc.nodes | awk '{print $2}')
-i=$(getent -s dns hosts $node|awk '{print $1}'|awk -F'.' '{print $4}')
-
+i=$(getent -s dns hosts ${node}|awk '{print $1}'|awk -F'.' '{print $4}')
+echo
+echo "found ip index <$i>"
+echo
 echo
 echo "# before nmcli renaming"
 sudo nmcli c show
@@ -71,8 +73,8 @@ echo
 
 for nic in $ETH0 $ETH1 $ETH2 $ETH3
 do
-    uuid=$(nmcli -t --fields name,uuid,device c show | grep $nic | awk -F':' '{print $2}')
-    nmcli c modify uuid $uuid connection.id $nic
+    uuid=$(sudo nmcli -t --fields name,uuid,device c show | grep $nic | awk -F':' '{print $2}')
+    sudo nmcli c modify uuid $uuid connection.id $nic
 done
 
 echo
