@@ -1,5 +1,10 @@
 #!/bin/bash
 
+set -a
+
+ROOTVG=$(df -h / | grep mapper| awk '{print $1}' | awk -F'/' '{print $4}' | awk -F'-' '{print $1}')
+
+
 grep -q 'use_lvmetad = 1' /etc/lvm/lvm.conf || {
 cp /etc/lvm/lvm.conf /etc/lvm/lvm.conf.preosvc
 cat /etc/lvm/lvm.conf.preosvc | sed -e 's/use_lvmetad = 1/use_lvmetad = 0/g' > /etc/lvm/lvm.conf
@@ -23,9 +28,9 @@ activation {
 EOF
 }
 
-if [ ! -f "/etc/debian_version" ]
+if [ ! -f "/etc/debian_version" -a ! -z ${ROOTVG} ]
 then
-	vgchange --addtag local VolGroup00
+	vgchange --addtag local ${ROOTVG}
 fi
 
 exit 0
