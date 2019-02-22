@@ -10,6 +10,8 @@ grep -q '/data/vdc/share /mnt nfs' /proc/mounts && {
 	umount /mnt
 }
 
+[[ ! -d /etc/auto.master.d ]] && mkdir -p /etc/auto.master.d
+
 cat - <<EOF >|/etc/auto.master.d/osvcdata.autofs
 ${VMAUTOFSROOT}    /etc/auto.osvcdata    --ghost,--timeout=30
 /nfspool   /etc/auto.nfspool     --ghost,--timeout=30
@@ -23,8 +25,8 @@ cat - <<EOF >|/etc/auto.nfspool
 data -fstype=nfs,rw,soft,actimeo=2,rsize=8192,wsize=8192   ${VDCBOXIP}:/data/vdc/share/nfspool
 EOF
 
-systemctl enable autofs.service
-systemctl restart autofs.service
+sudo systemctl enable autofs.service
+sudo systemctl restart autofs.service
 
 [[ ! -L /data ]] && {
 	ln -sf ${VMAUTOFSROOT}/${VMAUTOFSKEY} /data
@@ -41,3 +43,5 @@ systemctl restart autofs.service
     sudo yum-config-manager -q --add-repo file:///data/repos/elrepo/7
     sudo yum repolist
 }
+
+exit 0
