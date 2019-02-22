@@ -14,13 +14,12 @@
     - git
     - iotop
     - links
+    - lsscsi
     - lvm2
     - mdadm
     - mlocate
     - net-tools
     - psmisc
-    - python-crypto
-    - python-requests
     - runc
     - wget
 
@@ -42,6 +41,7 @@
       update_cache:  yes
     vars:
       packages:
+        - autofs
         - dnsutils
         - multipath-tools
         - network-manager
@@ -60,6 +60,10 @@
     vars:
       packages:
         - docker.io
+        - lxd
+        - zfsutils-linux
+        - python-setuptools
+        - python3-setuptools
     when: (ansible_facts['distribution'] == "Ubuntu" )
 
   - name: install docker package for debian
@@ -82,6 +86,7 @@
         - autofs
         - bind-utils
         - device-mapper-multipath
+        - docker
         - iscsi-initiator-utils
         - net-tools
         - nfs-utils
