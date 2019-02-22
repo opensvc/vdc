@@ -38,5 +38,5 @@ function clean_hosts()
 
 clean_hosts
 gen_data >> /etc/hosts
-systemctl reload dnsmasq.service
+systemctl restart systemd-resolved.service
 
