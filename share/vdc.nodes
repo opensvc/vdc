@@ -42,6 +42,8 @@ vipwls-managedsrv2 52
 vipwls-loadbalancer 59
 xenial-1 80
 xenial-2 81
+bionic-1 82
+bionic-2 83
 deb-1 90
 deb-2 91
 node1 101
@@ -105,4 +107,8 @@ solaris11-1-1 174
 solaris11-1-2 175
 solaris10-1-1 176
 solaris10-1-2 177
+svclxd1 178
+svclxd2 179
+svclxc1 180
+svclxc2 181
 infra-2 210
