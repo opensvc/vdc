@@ -96,3 +96,11 @@ virsh vol-list --pool vdc | \
 	grep "/data/vdc/pool/lab_cluster.*img" | \
 	awk '{print $1}' | \
 	xargs -n1 virsh vol-delete --pool vdc --vol
+
+
+# vagrant/vbox survival guide
+# ----------------------
+# vagrant up --debug &> vagrant.log
+# vboxmanage showvminfo vm-name
+# vboxmanage list hdds      # liste les disques de la database vagrant
+# vboxmanage closemedium disk eb42735a-980c-4da5-9ae4-95c5ff48b1bb --delete  # retire un disque de la database vagrant
