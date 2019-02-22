@@ -2,7 +2,7 @@
 
 set -a
 
-ROOTVG=$(df -h / | grep mapper| awk '{print $1}' | awk -F'/' '{print $4}' | awk -F'-' '{print $1}')
+ROOTVG=$(lvs --noheadings -o name,vg_name | grep -w root | awk '{print $2}')
 
 
 grep -q 'use_lvmetad = 1' /etc/lvm/lvm.conf || {
