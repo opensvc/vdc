@@ -18,6 +18,7 @@
     - lvm2
     - mdadm
     - mlocate
+    - ntp
     - net-tools
     - psmisc
     - runc
@@ -90,6 +91,7 @@
         - iscsi-initiator-utils
         - net-tools
         - nfs-utils
+        - ntpdate
         - python34
         - python34-crypto
         - python34-requests
