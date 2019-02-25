@@ -5,7 +5,7 @@
 [[ -d /usr/libexec/docker ]] && {
     cd /usr/libexec/docker/
     [[ ! -L docker-runc ]] && sudo ln -s docker-runc-current docker-runc
-    sudo grep -q 'PATH:/usr/libexec/docker' /etc/sysconfig/opensvc || {
+    sudo grep -q 'PATH:/usr/libexec/docker' /etc/sysconfig/opensvc 2>/dev/null || {
 	    echo "export PATH=\$PATH:/usr/libexec/docker" | sudo tee -a /etc/sysconfig/opensvc
     }
 }
