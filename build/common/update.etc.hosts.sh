@@ -1,6 +1,9 @@
 #!/bin/bash
 
+set -a
+
 INVENTORY="/data/vdc/share/vdc.nodes"
+TIMESTAMP=$(date -u +%Y%m%d%H%M%S)
 
 declare -A subnets
 subnets["192.168.100"]=""
@@ -29,7 +32,6 @@ function gen_data()
 function clean_hosts()
 {
     # remove old entries
-    TIMESTAMP=$(date -u +%Y%m%d%H%M%S)
     cp -pf /etc/hosts /etc/hosts.$TIMESTAMP && {
         cat /etc/hosts.$TIMESTAMP | sed '/## OPENSVC VAGRANT LAB BEGIN ##/,/## OPENSVC VAGRANT LAB END ##/d' > /etc/hosts
     }
@@ -38,5 +40,12 @@ function clean_hosts()
 
 clean_hosts
 gen_data >> /etc/hosts
-systemctl restart systemd-resolved.service
+OLDSUM=$(md5sum /etc/hosts.$TIMESTAMP | awk '{print $1}')
+NEWSUM=$(md5sum /etc/hosts | awk '{print $1}')
 
+[[ $OLDSUM != $NEWSUM ]] && {
+    echo "Changes detected, restarting systemd-resolved"
+    systemctl restart systemd-resolved.service
+}
+
+exit 0
