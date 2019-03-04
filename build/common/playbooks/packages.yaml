@@ -14,6 +14,7 @@
     - git
     - iotop
     - links
+    - lsof
     - lsscsi
     - lvm2
     - mdadm
@@ -21,14 +22,15 @@
     - ntp
     - net-tools
     - psmisc
+    - strace
     - runc
     - wget
+    when: (ansible_facts['system'] == "Linux" )
 
   - name: install epel channel for rhel/centos/fedora
     yum:
       name:  "{{ packages }}"
       state: present
-      update_cache:  yes
     vars:
       packages:
         - epel-release
@@ -39,7 +41,6 @@
     apt:
       name:  "{{ packages }}"
       state: present
-      update_cache:  yes
     vars:
       packages:
         - autofs
@@ -57,10 +58,11 @@
     apt:
       name:  "{{ packages }}"
       state: present
-      update_cache:  yes
     vars:
       packages:
         - docker.io
+        - lxc-utils
+        - lxc-templates
         - lxd
         - zfsutils-linux
         - python-setuptools
@@ -71,7 +73,6 @@
     apt:
       name:  "{{ packages }}"
       state: present
-      update_cache:  yes
     vars:
       packages:
         - docker
@@ -81,7 +82,6 @@
     yum:
       name:  "{{ packages }}"
       state: present
-      update_cache:  yes
     vars:
       packages:
         - autofs
@@ -90,11 +90,14 @@
         - docker
         - iscsi-initiator-utils
         - net-tools
+        - lxc
+        - lxc-extra
+        - lxc-templates
         - nfs-utils
         - ntpdate
-        - python34
-        - python34-crypto
-        - python34-requests
+        - python36
+        - python36-requests
+        - python36-pycryptodomex
         - sg3_utils
     when: (ansible_facts['distribution'] == "CentOS" ) or
           (ansible_facts['distribution'] == "RHEL" )
@@ -107,3 +110,22 @@
     with_items:
     - htop
     - jq
+    when: (ansible_facts['system'] == "Linux" )
+
+  - name: install Solaris ips packages
+    pkg5:
+      name:
+        - developer/versioning/git
+        - web/browser/links
+        - runtime/python-35
+        - library/python/requests-35
+        - library/python/cryptography-35
+    when: ansible_facts['distribution'] == "Solaris"
+
+  - name: update local pkg catalog
+    command: /opt/csw/bin/pkgutil -U
+    when: ansible_facts['distribution'] == "Solaris"
+
+  - name: update local pkg catalog
+    command: /opt/csw/bin/pkgutil -i lsof
+    when: ansible_facts['distribution'] == "Solaris"
