@@ -1,94 +1,101 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+#
+
+require 'yaml'
+
+current_dir    = File.dirname(File.expand_path(__FILE__))
+configs        = YAML.load_file("#{current_dir}/../vagrant.osvc.config.yaml")
+vagrant_config = configs['configs'][configs['configs']['use']]
 
 hosts = {
 	"node-1-1" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-1",
                 "sshexpose" => 22211
 	},
 	"node-1-2" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-1",
                 "sshexpose" => 22212
 	},
 	"node-2-1" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-2",
                 "sshexpose" => 22221
 	},
 	"node-2-2" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-2",
                 "sshexpose" => 22222
 	},
 	"node-3-1" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-3",
                 "sshexpose" => 22231
 	},
 	"node-3-2" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-3",
                 "sshexpose" => 22232
 	},
 	"node-4-1" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-4",
                 "sshexpose" => 22241
 	},
 	"node-4-2" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-4",
                 "sshexpose" => 22242
 	},
 	"node-5-1" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-5",
                 "sshexpose" => 22251
 	},
 	"node-5-2" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-5",
                 "sshexpose" => 22252
 	},
 	"node-6-1" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-6",
                 "sshexpose" => 22261
 	},
 	"node-6-2" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-6",
                 "sshexpose" => 22262
 	},
 	"node-7-1" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-7",
                 "sshexpose" => 22271
 	},
 	"node-7-2" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-7",
                 "sshexpose" => 22272
 	},	
 	"node-8-1" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-8",
                 "sshexpose" => 22281
 	},
 	"node-8-2" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-8",
                 "sshexpose" => 22282
 	},
 	"node-9-1" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-9",
                 "sshexpose" => 22291
 	},
 	"node-9-2" => {
-		"memory" => 1024,
+		"memory" => 512,
 		"cluster" => "cluster-9",
                 "sshexpose" => 22292
 	},
@@ -100,54 +107,50 @@ hosts = {
 }
 
 Vagrant.configure("2") do |config|
-#	config.vm.synced_folder "../../sync", "/data", type: "rsync"
-	config.vm.synced_folder "../../share", "/data",
-		nfs: true,
-		mount_options: ['ro,actimeo=2']
-	config.vm.provision "shell", path: "../common/yum.sh"
-	config.vm.provision "shell", path: "../common/net.sh"
+        config.trigger.before [:up, :halt, :provision] do |trigger|
+                trigger.run = {inline: "cp /data/vdc/share/vdc.nodes ."}
+                trigger.run = {inline: "/data/vdc/build/common/update.etc.hosts.sh"}
+        end
+	config.vm.provision "ansible" do |ansible|
+		ansible.playbook = "../common/playbooks/packages.yaml"
+        end
+        config.vm.provision "shell", path: "../common/ntp.sh"
+        config.vm.provision "shell", path: "../common/net.sh"
+        config.vm.provision "shell", path: "../common/yum.sh", env: {"VDCBOXIP" => vagrant_config['vdcboxip'], "VDCBOXEXPORT" => vagrant_config['vdcboxexport']}
+        config.vm.provision "shell", path: "../common/autofs.sh", env: {"VDCBOXIP" => vagrant_config['vdcboxip'], "VDCBOXEXPORT" => vagrant_config['vdcboxexport'], "VMNFSROOT" => vagrant_config['vmnfsroot'], "VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
 	config.vm.provision "shell", path: "../common/ssh.sh"
 	config.vm.provision "shell", path: "../common/md.sh"
+        config.vm.provision "shell", path: "../common/docker.sh"
 	config.vm.provision "shell", path: "../common/lvm.sh"
-	config.vm.provision "shell", path: "../common/opensvc.sh"
-	config.vm.provision "shell", path: "../common/opensvc-listener.sh"
-	config.vm.provision "shell", path: "../common/user.sh"
+	config.vm.provision "shell", path: "../common/user.sh", env: {"VAGRANTPASSWDBASE64HASH" => vagrant_config['vagrantpasswdbase64hash']}
 	config.vm.provision "shell", path: "../common/alias.sh"
 	config.vm.provision "shell", path: "../common/selinux.sh"
-	config.vm.provision "shell", path: "../common/iscsi.sh"
-	config.vm.provision "shell", path: "../common/drbd.sh"
+	config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
+	config.vm.provision "shell", path: "../common/qabot.ssh.key.sh"
+        config.vm.provision "shell", path: "../common/distrib.upgrade.sh"
+
+
 	hosts.each do |name, desc|
 		config.vm.define name do |machine|
-			machine.vm.box = "centos/7"
+			machine.vm.box = "bento/centos-7"
 			machine.vm.hostname = "%s" % name
-			machine.vm.network :public_network,
-				:dev => "br-prd",
-				:mode => "bridge",
-				:type => "bridge"
-			machine.vm.network :public_network,
-				:dev => "br-hb0",
-				:mode => "bridge",
-				:type => "bridge"
-			machine.vm.network :public_network,
-				:dev => "br-hb1",
-				:mode => "bridge",
-				:type => "bridge"
-			machine.vm.provider "libvirt" do |v|
-				v.memory = desc["memory"]
-				v.storage_pool_name = "vdc"
-				v.volume_cache = "writeback"
-				config.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], host_ip: "192.168.99.2"
-				config.vm.box_version = "1804.02"
-				#v.storage :file,
-				#	:device => :cdrom,
-				#	:path => '/data/vdc/iso/CentOS-7-x86_64-Everything-1611.iso'
-				#v.storage :file,
-				#	:size => "1G",
-				#	:path => "lab_%s.disk1.img" % desc["cluster"],
-				#	:allow_existing => true,
-				#	:shareable => true,
-				#	:type => "raw",
-				#	:cache => "writeback"
+                        machine.vm.network "private_network", :type => 'dhcp', :name => 'vboxnet0', :adapter => 2
+                        machine.vm.network "public_network", bridge: "br-prd", auto_config: false
+                        machine.vm.network "public_network", bridge: "br-hb0", auto_config: false
+                        machine.vm.network "public_network", bridge: "br-hb1", auto_config: false
+                        machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"]
+                        machine.vm.provider "virtualbox" do |v|
+                                v.memory = desc["memory"]
+                                v.name = "%s" % name
+                                v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+                                v.customize ["modifyvm", :id, "--audio", "none"]
+                                #v.customize ["setproperty", "vrdeauthlibrary", "null"]
+                                v.customize ["modifyvm", :id, "--vrde", "on"]
+                                vrdpexpose = desc["sshexpose"] + 1000
+                                v.customize ["modifyvm", :id, "--vrdeport", vrdpexpose]
+                                v.customize ["modifyvm", :id, "--vrdeaddress", "0.0.0.0"]
+                                #v.customize ["modifyvm", :id, "--vrdeauthtype", "external"]
+                                #v.customize ["setextradata", :id, "VBoxAuthSimple/users/console", vagrant_config['vrdppasswdhash']]
 			end
 		end
 	end
