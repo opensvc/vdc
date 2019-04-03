@@ -10,6 +10,7 @@
       state=latest
       name={{item}}
     with_items:
+    - bash-completion
     - bridge-utils
     - git
     - iotop
@@ -54,7 +55,11 @@
     when: (ansible_facts['distribution'] == "Ubuntu" ) or
           (ansible_facts['distribution'] == "Debian" )
 
-  - name: install docker package for ubuntu
+  - name: check version integer
+    debug: msg="ansible_distribution_major_version {{ ansible_distribution_major_version|int }} as an integer"
+    when: ansible_distribution_major_version|int > 1
+
+  - name: install package for ubuntu
     apt:
       name:  "{{ packages }}"
       state: present
@@ -67,7 +72,22 @@
         - zfsutils-linux
         - python-setuptools
         - python3-setuptools
-    when: (ansible_facts['distribution'] == "Ubuntu" )
+    when: (ansible_facts['distribution'] == "Ubuntu" ) and
+          (ansible_distribution_major_version|int >= 18)
+
+  - name: install package for ubuntu old
+    apt:
+      name:  "{{ packages }}"
+      state: present
+    vars:
+      packages:
+        - docker.io
+        - lxc-utils
+        - zfsutils-linux
+        - python-setuptools
+        - python3-setuptools
+    when: (ansible_facts['distribution'] == "Ubuntu" ) and
+          (ansible_distribution_major_version|int < 18)
 
   - name: install docker package for debian
     apt:
@@ -126,6 +146,6 @@
     command: /opt/csw/bin/pkgutil -U
     when: ansible_facts['distribution'] == "Solaris"
 
-  - name: update local pkg catalog
-    command: /opt/csw/bin/pkgutil -i lsof
+  - name: install CSWlsof
+    command: /opt/csw/bin/pkgutil -y -i lsof
     when: ansible_facts['distribution'] == "Solaris"
