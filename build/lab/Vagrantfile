@@ -142,6 +142,7 @@ Vagrant.configure("2") do |config|
                         machine.vm.provider "virtualbox" do |v|
                                 v.memory = desc["memory"]
                                 v.name = "%s" % name
+                                v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
                                 v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
                                 v.customize ["modifyvm", :id, "--audio", "none"]
                                 #v.customize ["setproperty", "vrdeauthlibrary", "null"]
