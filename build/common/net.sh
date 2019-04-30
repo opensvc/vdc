@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ls -l /vagrant
+
 set -a
 
 SLEEP=10
@@ -34,6 +36,8 @@ do
 	echo ETH$i=${!varname}
 done
 
+if [ -f "/etc/debian_version" ]
+then
 for i in 1 2 3
 do
 	varname=ETH$i
@@ -41,6 +45,7 @@ do
 	ip link set ${!varname} down
 	ip link set ${!varname} up
 done
+fi
 
 # from here we have identified 4 nics defined in ETH0/1/2/3
 
@@ -61,8 +66,8 @@ sudo systemctl restart $UNIT || /bin/true
 sleep $SLEEP
 
 node=$(hostname -s)
-#i=$(grep $node /data/vdc.nodes | awk '{print $2}')
-i=$(getent -s dns hosts ${node}|awk '{print $1}'|awk -F'.' '{print $4}')
+i=$(grep $node /vagrant/vdc.nodes | awk '{print $2}')
+#i=$(getent -s dns hosts ${node}|awk '{print $1}'|awk -F'.' '{print $4}'|sort -u)
 echo
 echo "found ip index <$i>"
 echo
@@ -74,7 +79,7 @@ echo
 for nic in $ETH0 $ETH1 $ETH2 $ETH3
 do
     uuid=$(sudo nmcli -t --fields name,uuid,device c show | grep $nic | awk -F':' '{print $2}')
-    sudo nmcli c modify uuid $uuid connection.id $nic
+    sudo nmcli c modify uuid $uuid connection.id $nic || sudo nmcli c add type ethernet ifname $nic con-name $nic autoconnect yes save yes
 done
 
 echo
