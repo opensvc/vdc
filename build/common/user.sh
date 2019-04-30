@@ -21,3 +21,8 @@ getent passwd vagrant && {
 	echo "Changing password for user vagrant"
         echo "vagrant:$(echo ${VAGRANTPASSWDBASE64HASH} | base64 -d)" | sudo chpasswd --encrypted
 }
+
+getent passwd root && {
+	echo "Changing password for user root"
+        echo "root:$(echo ${VAGRANTPASSWDBASE64HASH} | base64 -d)" | sudo chpasswd --encrypted
+}
