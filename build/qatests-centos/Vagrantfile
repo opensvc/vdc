@@ -1,0 +1,77 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+
+require 'yaml'
+
+current_dir    = File.dirname(File.expand_path(__FILE__))
+configs        = YAML.load_file("#{current_dir}/../vagrant.osvc.config.yaml")
+vagrant_config = configs['configs'][configs['configs']['use']]
+
+hosts = {
+	"qatestcentos7-50-1" => {
+		"memory" => 512,
+		"cluster" => "cluster-50",
+                "sshexpose" => 22501
+	},
+	"qatestcentos7-50-2" => {
+		"memory" => 512,
+		"cluster" => "cluster-50",
+                "sshexpose" => 22502
+	},
+#	"qatestcentos7-50-3" => {
+#		"memory" => 512,
+#		"cluster" => "cluster-50",
+#                "sshexpose" => 22503
+#	},
+}
+
+Vagrant.configure("2") do |config|
+        config.trigger.before [:up, :halt, :provision] do |trigger|
+                trigger.run = {inline: "cp /data/vdc/share/vdc.nodes ."}
+                trigger.run = {inline: "/data/vdc/build/common/update.etc.hosts.sh"}
+        end
+	config.vm.provision "ansible" do |ansible|
+		ansible.playbook = "../common/playbooks/packages.yaml"
+        end
+        config.vm.provision "shell", path: "../common/ntp.sh"
+        config.vm.provision "shell", path: "../common/net.sh"
+        config.vm.provision "shell", path: "../common/yum.sh", env: {"VDCBOXIP" => vagrant_config['vdcboxip'], "VDCBOXEXPORT" => vagrant_config['vdcboxexport']}
+        config.vm.provision "shell", path: "../common/autofs.sh", env: {"VDCBOXIP" => vagrant_config['vdcboxip'], "VDCBOXEXPORT" => vagrant_config['vdcboxexport'], "VMNFSROOT" => vagrant_config['vmnfsroot'], "VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
+	config.vm.provision "shell", path: "../common/ssh.sh"
+	config.vm.provision "shell", path: "../common/md.sh"
+        config.vm.provision "shell", path: "../common/docker.sh"
+	config.vm.provision "shell", path: "../common/lvm.sh"
+	config.vm.provision "shell", path: "../common/user.sh", env: {"VAGRANTPASSWDBASE64HASH" => vagrant_config['vagrantpasswdbase64hash']}
+	config.vm.provision "shell", path: "../common/alias.sh"
+	config.vm.provision "shell", path: "../common/selinux.sh"
+	config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
+	config.vm.provision "shell", path: "../common/qabot.ssh.key.sh"
+
+
+	hosts.each do |name, desc|
+		config.vm.define name do |machine|
+			machine.vm.box = "bento/centos-7"
+			machine.vm.hostname = "%s" % name
+                        machine.vm.network "private_network", :type => 'dhcp', :name => 'vboxnet0', :adapter => 2
+                        machine.vm.network "public_network", bridge: "br-prd", auto_config: false
+                        machine.vm.network "public_network", bridge: "br-hb0", auto_config: false
+                        machine.vm.network "public_network", bridge: "br-hb1", auto_config: false
+                        machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], id: "ssh"
+                        machine.vm.provider "virtualbox" do |v|
+                                v.memory = desc["memory"]
+                                v.name = "%s" % name
+                                v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+                                v.customize ["modifyvm", :id, "--audio", "none"]
+                                #v.customize ["setproperty", "vrdeauthlibrary", "null"]
+                                v.customize ["modifyvm", :id, "--vrde", "on"]
+                                vrdpexpose = desc["sshexpose"] + 1000
+                                v.customize ["modifyvm", :id, "--vrdeport", vrdpexpose]
+                                v.customize ["modifyvm", :id, "--vrdeaddress", "0.0.0.0"]
+                                #v.customize ["modifyvm", :id, "--vrdeauthtype", "external"]
+                                #v.customize ["setextradata", :id, "VBoxAuthSimple/users/console", vagrant_config['vrdppasswdhash']]
+			end
+		end
+	end
+end
+
