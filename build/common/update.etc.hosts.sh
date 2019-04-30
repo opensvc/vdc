@@ -2,6 +2,8 @@
 
 set -a
 
+echo "Updating /etc/hosts with vdc nodes records"
+
 INVENTORY="/data/vdc/share/vdc.nodes"
 TIMESTAMP=$(date -u +%Y%m%d%H%M%S)
 
@@ -38,8 +40,21 @@ function clean_hosts()
     find /etc -name \*hosts.2\* -ctime +7 -exec rm -f {} \;
 }
 
+function distribute_data()
+{
+    find /data/vdc/build -name Vagrantfile | while read vagrantfile
+    do
+        tgt=$(dirname $vagrantfile)
+	/bin/cp /data/vdc/share/vdc.nodes* $tgt/
+    done
+}
+
 clean_hosts
-gen_data >> /etc/hosts
+gen_data > /data/vdc/share/vdc.nodes.hosts
+cat /data/vdc/share/vdc.nodes.hosts >> /etc/hosts
+
+distribute_data
+
 OLDSUM=$(md5sum /etc/hosts.$TIMESTAMP | awk '{print $1}')
 NEWSUM=$(md5sum /etc/hosts | awk '{print $1}')
 
