@@ -9,115 +9,179 @@ configs        = YAML.load_file("#{current_dir}/../vagrant.osvc.config.yaml")
 vagrant_config = configs['configs'][configs['configs']['use']]
 
 hosts = {
-	"node-1-1" => {
+	"node1-1" => {
 		"memory" => 512,
 		"cluster" => "cluster-1",
-                "sshexpose" => 22211
+                "sshexpose" => 20111
 	},
-	"node-1-2" => {
+	"node2-1" => {
 		"memory" => 512,
 		"cluster" => "cluster-1",
-                "sshexpose" => 22212
+                "sshexpose" => 20112
 	},
-	"node-2-1" => {
+	"node1-2" => {
 		"memory" => 512,
 		"cluster" => "cluster-2",
-                "sshexpose" => 22221
+                "sshexpose" => 20211
 	},
-	"node-2-2" => {
+	"node2-2" => {
 		"memory" => 512,
 		"cluster" => "cluster-2",
-                "sshexpose" => 22222
+                "sshexpose" => 20212
 	},
-	"node-3-1" => {
+	"node1-3" => {
 		"memory" => 512,
 		"cluster" => "cluster-3",
-                "sshexpose" => 22231
+                "sshexpose" => 20311
 	},
-	"node-3-2" => {
+	"node2-3" => {
 		"memory" => 512,
 		"cluster" => "cluster-3",
-                "sshexpose" => 22232
+                "sshexpose" => 20312
 	},
-	"node-4-1" => {
+	"node1-4" => {
 		"memory" => 512,
 		"cluster" => "cluster-4",
-                "sshexpose" => 22241
+                "sshexpose" => 20411
 	},
-	"node-4-2" => {
+	"node2-4" => {
 		"memory" => 512,
 		"cluster" => "cluster-4",
-                "sshexpose" => 22242
+                "sshexpose" => 20412
 	},
-	"node-5-1" => {
+	"node1-5" => {
 		"memory" => 512,
 		"cluster" => "cluster-5",
-                "sshexpose" => 22251
+                "sshexpose" => 20511
 	},
-	"node-5-2" => {
+	"node2-5" => {
 		"memory" => 512,
 		"cluster" => "cluster-5",
-                "sshexpose" => 22252
+                "sshexpose" => 20512
 	},
-	"node-6-1" => {
+	"node1-6" => {
 		"memory" => 512,
 		"cluster" => "cluster-6",
-                "sshexpose" => 22261
+                "sshexpose" => 20611
 	},
-	"node-6-2" => {
+	"node2-6" => {
 		"memory" => 512,
 		"cluster" => "cluster-6",
-                "sshexpose" => 22262
+                "sshexpose" => 20612
 	},
-	"node-7-1" => {
+	"node1-7" => {
 		"memory" => 512,
 		"cluster" => "cluster-7",
-                "sshexpose" => 22271
+                "sshexpose" => 20711
 	},
-	"node-7-2" => {
+	"node2-7" => {
 		"memory" => 512,
 		"cluster" => "cluster-7",
-                "sshexpose" => 22272
+                "sshexpose" => 20712
 	},	
-	"node-8-1" => {
+	"node1-8" => {
 		"memory" => 512,
 		"cluster" => "cluster-8",
-                "sshexpose" => 22281
+                "sshexpose" => 20811
 	},
-	"node-8-2" => {
+	"node2-8" => {
 		"memory" => 512,
 		"cluster" => "cluster-8",
-                "sshexpose" => 22282
+                "sshexpose" => 20812
 	},
-	"node-9-1" => {
+	"node1-9" => {
 		"memory" => 512,
 		"cluster" => "cluster-9",
-                "sshexpose" => 22291
+                "sshexpose" => 20911
 	},
-	"node-9-2" => {
+	"node2-9" => {
 		"memory" => 512,
 		"cluster" => "cluster-9",
-                "sshexpose" => 22292
+                "sshexpose" => 20912
 	},
-	"node-9-3" => {
+	"node1-10" => {
 		"memory" => 512,
-		"cluster" => "cluster-9",
-                "sshexpose" => 22293
+		"cluster" => "cluster-10",
+                "sshexpose" => 21011
+	},
+	"node2-10" => {
+		"memory" => 512,
+		"cluster" => "cluster-10",
+                "sshexpose" => 21012
+	},
+	"node1-11" => {
+		"memory" => 512,
+		"cluster" => "cluster-11",
+                "sshexpose" => 21111
+	},
+	"node2-11" => {
+		"memory" => 512,
+		"cluster" => "cluster-11",
+                "sshexpose" => 21112
+	},
+	"node1-12" => {
+		"memory" => 512,
+		"cluster" => "cluster-12",
+                "sshexpose" => 21211
+	},
+	"node2-12" => {
+		"memory" => 512,
+		"cluster" => "cluster-12",
+                "sshexpose" => 21212
+	},
+	"node1-13" => {
+		"memory" => 512,
+		"cluster" => "cluster-13",
+                "sshexpose" => 21311
+	},
+	"node2-13" => {
+		"memory" => 512,
+		"cluster" => "cluster-13",
+                "sshexpose" => 21312
+	},
+	"node1-14" => {
+		"memory" => 512,
+		"cluster" => "cluster-14",
+                "sshexpose" => 21411
+	},
+	"node2-14" => {
+		"memory" => 512,
+		"cluster" => "cluster-14",
+                "sshexpose" => 21412
+	},
+	"node1-15" => {
+		"memory" => 512,
+		"cluster" => "cluster-15",
+                "sshexpose" => 21511
+	},
+	"node2-15" => {
+		"memory" => 512,
+		"cluster" => "cluster-15",
+                "sshexpose" => 21512
+	},
+	"node1-16" => {
+		"memory" => 512,
+		"cluster" => "cluster-16",
+                "sshexpose" => 21611
+	},
+	"node2-16" => {
+		"memory" => 512,
+		"cluster" => "cluster-16",
+                "sshexpose" => 21612
 	},
 }
 
 Vagrant.configure("2") do |config|
         config.trigger.before [:up, :halt, :provision] do |trigger|
-                trigger.run = {inline: "cp /data/vdc/share/vdc.nodes ."}
-                trigger.run = {inline: "/data/vdc/build/common/update.etc.hosts.sh"}
+                trigger.run = {inline: "../common/update.etc.hosts.sh"}
         end
 	config.vm.provision "ansible" do |ansible|
 		ansible.playbook = "../common/playbooks/packages.yaml"
         end
         config.vm.provision "shell", path: "../common/ntp.sh"
         config.vm.provision "shell", path: "../common/net.sh"
-        config.vm.provision "shell", path: "../common/yum.sh", env: {"VDCBOXIP" => vagrant_config['vdcboxip'], "VDCBOXEXPORT" => vagrant_config['vdcboxexport']}
-        config.vm.provision "shell", path: "../common/autofs.sh", env: {"VDCBOXIP" => vagrant_config['vdcboxip'], "VDCBOXEXPORT" => vagrant_config['vdcboxexport'], "VMNFSROOT" => vagrant_config['vmnfsroot'], "VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
+        config.vm.provision "shell", path: "../common/yum.sh"
+        config.vm.provision "shell", path: "../common/autofs.sh", env: {"VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
 	config.vm.provision "shell", path: "../common/ssh.sh"
 	config.vm.provision "shell", path: "../common/md.sh"
         config.vm.provision "shell", path: "../common/docker.sh"
@@ -136,10 +200,11 @@ Vagrant.configure("2") do |config|
 			machine.vm.hostname = "%s" % name
                         machine.vm.network "private_network", :type => 'dhcp', :name => 'vboxnet0', :adapter => 2
                         machine.vm.network "public_network", bridge: "br-prd", auto_config: false
-                        machine.vm.network "public_network", bridge: "br-hb0", auto_config: false
                         machine.vm.network "public_network", bridge: "br-hb1", auto_config: false
-                        machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"]
+                        machine.vm.network "public_network", bridge: "br-hb2", auto_config: false
+                        machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], id: "ssh"
                         machine.vm.provider "virtualbox" do |v|
+                                v.linked_clone = true
                                 v.memory = desc["memory"]
                                 v.name = "%s" % name
                                 v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
