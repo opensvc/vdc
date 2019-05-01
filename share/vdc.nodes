@@ -1,131 +1,57 @@
-infra-1 10
-node-1-1 11
-node-1-2 12
-node-1-3 13
-node-2-1 14
-node-2-2 15
-node-2-3 16
-node-3-1 17
-node-3-2 18
-node-3-3 19
-node-4-1 20
-node-4-2 21
-node-4-3 22
-node-5-1 23
-node-5-2 24
-node-5-3 25
-node-6-1 26
-node-6-2 27
-node-6-3 28
-node-7-1 29
-node-7-2 30
-node-7-3 31
-node-8-1 32
-node-8-2 33
-node-8-3 34
-node-9-1 35
-node-9-2 36
-node-9-3 37
-node-10-1 38
-node-10-2 39
-node-10-3 40
-node-11-1 41
-node-11-2 42
-node-12-1 43
-node-12-2 44
-viprac-node-12 45
-viprac-node-12-1 46
-viprac-node-12-2 47
-vipwls-adminsrv 50
-vipwls-managedsrv1 51
-vipwls-managedsrv2 52
-vipwls-loadbalancer 59
-xenial-1 80
-xenial-2 81
-bionic-1 82
-bionic-2 83
-deb-1 90
-deb-2 91
-node1 101
-node2 102
-sol11 110
-xenial 111
-node-13-1 112
-node-13-2 113
-viphaproxy-cluster-13 114
-vipgobetween-cluster-13 115
-vipdemosvc1-cluster-13 116
-vipdemosvc7-cluster-13 117
-vipdemosvc8-cluster-13 118
-vipdemosvc5-cluster-13 119
-qatestcentos7-50-1 120
-qatestcentos7-50-2 121
-qatestcentos7-50-3 122
-qatestcentos7-50-4 123
-qatestcentos7-50-5 124
-qatestsles12-51-1 125
-qatestsles12-51-2 126
-qatestsles12-51-3 127
-qatestsles12-51-4 128
-qatestsles12-51-5 129
-qatestubuntu-52-1 130
-qatestubuntu-52-2 131
-qatestubuntu-52-3 132
-qatestubuntu-52-4 133
-qatestubuntu-52-5 134
-qatestdeb-53-1 135
-qatestdeb-53-2 136
-qatestdeb-53-3 137
-qatestdeb-53-4 138
-qatestdeb-53-5 139
-rhel6-1-1 140
-rhel6-1-2 141
-rhel7-1-1 142
-rhel7-1-2 143
-rhel8-1-1 144
-rhel8-1-2 145
-osvpbogcrds01-rhel6-1 150
-osvpbogcrds01-rhel7-1 151
-tstdck-rhel7-1 152
-tstdrbd-rhel7-1 153
-minio-n10-11 154
-minio-n10-21 155
-minio-n10-12 156
-minio-n10-22 157
-gentoo-1 160
-gentoo-2 161
-poc-60-1 162
-poc-60-2 163
-poc-60-3 164
-svcpoc60-1 165
-svcpoc60-2 166
-svcpoc60-3 167
-svcpoc60-4 168
-fedora-1-1 170
-fedora-1-2 171
-vipfedora-1 172
-vipfedora-2 173
-sol114-1 174
-sol114-2 175
-solaris10-1-1 176
-solaris10-1-2 177
-svclxd1 178
-svclxd2 179
-svclxc1 180
-svclxc2 181
-labzone1 182
-labzone2 183
-svcapp1 184
-svcapp2 185
-ogwenvoy 199
-svc10-public 199
-infra-2 210
-ceph-1 211
-ceph-client 212
-ceph-server-1 213
-ceph-server-2 214
-ceph-server-3 215
-ceph-admin 216
-ringfs-1 220
-ringfs-2 221
-ringfs-3 222
+infra1 0 10
+infra2 0 210
+node1-1 1 11
+node2-1 1 12
+node3-1 1 13
+node1-2 2 11
+node2-2 2 12
+node3-2 2 13
+node1-3 3 11
+node2-3 3 12
+node3-3 3 13
+node1-4 4 11
+node2-4 4 12
+node3-4 4 13
+node1-5 5 11
+node2-5 5 12
+node3-5 5 13
+node1-6 6 11
+node2-6 6 12
+node3-6 6 13
+node1-7 7 11
+node2-7 7 12
+node3-7 7 13
+node1-8 8 11
+node2-8 8 12
+node3-8 8 13
+node1-9 9 11
+node2-9 9 12
+node3-9 9 13
+node1-10 10 11
+node2-10 10 12
+node3-10 10 13
+node1-11 11 11
+node2-11 11 12
+node3-11 11 13
+node1-12 12 11
+node2-12 12 12
+node3-12 12 13
+node1-13 13 11
+node2-13 13 12
+node3-13 13 13
+node1-14 14 11
+node2-14 14 12
+node3-14 14 13
+node1-15 15 11
+node2-15 15 12
+node3-15 15 13
+node1-16 16 11
+node2-16 16 12
+node3-16 16 13
+qac71-17 17 11
+qac72-17 17 12
+qad91-18 18 11
+qad92-18 18 12
+ringfs-1 19 220
+ringfs-2 19 221
+ringfs-3 19 222
