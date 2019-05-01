@@ -2,17 +2,26 @@
 
 set -a
 
+. ../../vdc.env
+
 echo "Updating /etc/hosts with vdc nodes records"
 
-INVENTORY="/data/vdc/share/vdc.nodes"
 TIMESTAMP=$(date -u +%Y%m%d%H%M%S)
 
+# build subnets table
 declare -A subnets
-subnets["192.168.100"]=""
-subnets["192.168.101"]="-hb0"
-subnets["192.168.102"]="-hb1"
+typeset -i idx=0
 
-[[ ! -f $INVENTORY ]] && {
+while [[ $idx -lt $VDC_CLUSTER_IDX ]]
+do
+    #ipstring="$ipstring,$netA.$idx.$cpt.1/24"
+    subnets["${VDC_SUBNET_A}.${idx}.0"]=""
+    subnets["${VDC_SUBNET_A}.${idx}.1"]="-hb1"
+    subnets["${VDC_SUBNET_A}.${idx}.2"]="-hb2"
+    let idx=$idx+1
+done
+
+[[ ! -f ${VDC_NODES} ]] && {
 	echo "error: vdc.nodes is missing. exiting"
 	exit 1
 }
@@ -21,11 +30,14 @@ function gen_data()
 {
     # prepare new entries
     printf "## OPENSVC VAGRANT LAB BEGIN ##\n"
-    cat $INVENTORY | while read alias index
+    cat ${VDC_NODES} | while read nodename cluid ip
     do
-        for key in ${!subnets[@]};
+	#echo --- $nodename --- $cluid --- $ip
+        for key in ${!subnets[@]}
         do
-            printf "%s.%s\t%s%s\n" "$key" "$index" "$alias" "${subnets[$key]}"
+	    [[ $key == ${VDC_SUBNET_A}.${cluid}.* ]] && {
+                printf "%s.%s\t%s%s\n" "$key" "$ip" "$nodename" "${subnets[$key]}"
+            }
         done
     done
     printf "## OPENSVC VAGRANT LAB END ##\n"
@@ -42,10 +54,11 @@ function clean_hosts()
 
 function distribute_data()
 {
-    find /data/vdc/build -name Vagrantfile | while read vagrantfile
+    find /data/vdc/build -maxdepth 2 -name Vagrantfile | while read vagrantfile
     do
         tgt=$(dirname $vagrantfile)
 	/bin/cp /data/vdc/share/vdc.nodes* $tgt/
+	/bin/cp /data/vdc/vdc.env $tgt/
     done
 }
 

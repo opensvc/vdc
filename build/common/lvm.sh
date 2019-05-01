@@ -1,5 +1,11 @@
 #!/bin/bash
 
+echo
+echo "#####################"
+echo "######## LVM ########"
+echo "#####################"
+echo
+
 set -a
 
 ROOTVG=$(lvs --noheadings -o name,vg_name | grep -w root | awk '{print $2}')

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+echo
+echo "######################"
+echo "######## USER ########"
+echo "######################"
+echo
+echo
+
+
 env | grep -q VAGRANTPASSWDBASE64HASH || {
 	echo
 	echo "Error : VAGRANTPASSWDBASE64HASH env variable is expected to be set. Exiting"
@@ -9,11 +17,13 @@ env | grep -q VAGRANTPASSWDBASE64HASH || {
 
 # user
 getent passwd opensvc || {
+	echo "Creating user opensvc"
 	sudo useradd opensvc
 	echo opensvc:opensvc | sudo chpasswd
 }
 
 getent group vagrant | grep -q opensvc || {
+	echo "Adding opensvc user to vagrant group"
 	sudo usermod -G vagrant opensvc
 }
 

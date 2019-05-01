@@ -1,5 +1,13 @@
 #!/bin/bash
 
+echo
+echo "#########################"
+echo "######## NETWORK ########"
+echo "#########################"
+echo
+
+. /vagrant/vdc.env
+
 ls -l /vagrant
 
 set -a
@@ -66,10 +74,13 @@ sudo systemctl restart $UNIT || /bin/true
 sleep $SLEEP
 
 node=$(hostname -s)
-i=$(grep $node /vagrant/vdc.nodes | awk '{print $2}')
+ip=$(grep -w ^$node /vagrant/vdc.nodes | awk '{print $3}')
+cluid=$(grep -w ^$node /vagrant/vdc.nodes | awk '{print $2}')
+
 #i=$(getent -s dns hosts ${node}|awk '{print $1}'|awk -F'.' '{print $4}'|sort -u)
 echo
-echo "found ip index <$i>"
+echo "found ip index <$ip>"
+echo "found cluster id <$cluid>"
 echo
 echo
 echo "# before nmcli renaming"
@@ -79,7 +90,7 @@ echo
 for nic in $ETH0 $ETH1 $ETH2 $ETH3
 do
     uuid=$(sudo nmcli -t --fields name,uuid,device c show | grep $nic | awk -F':' '{print $2}')
-    sudo nmcli c modify uuid $uuid connection.id $nic || sudo nmcli c add type ethernet ifname $nic con-name $nic autoconnect yes save yes
+    sudo nmcli c modify uuid $uuid connection.id $nic 2>/dev/null || sudo nmcli c add type ethernet ifname $nic con-name $nic autoconnect yes save yes
 done
 
 echo
@@ -92,14 +103,14 @@ bridge=bridge-br-prd
 nmcli c show | grep -q $bridge || {
 	sudo nmcli c add type bridge ifname br-prd con-name $bridge
 	sudo nmcli c mod $bridge bridge.stp no
-	sudo nmcli c mod $bridge ipv4.method manual ipv4.addresses 192.168.100.$i/24
-	sudo nmcli c mod $bridge ipv4.routes "192.168.99.0/24 192.168.100.1"
+	sudo nmcli c mod $bridge ipv4.method manual ipv4.addresses ${VDC_SUBNET_A}.${cluid}.0.${ip}/24
+	#sudo nmcli c mod $bridge ipv4.routes "192.168.99.0/24 192.168.100.1"
 }
 
 sudo nmcli c mod $ETH0 ipv4.method auto
 sudo nmcli c mod $ETH1 connection.master br-prd connection.slave-type bridge
-sudo nmcli c mod $ETH2 ipv4.method manual ipv4.addresses 192.168.101.$i/24
-sudo nmcli c mod $ETH3 ipv4.method manual ipv4.addresses 192.168.102.$i/24
+sudo nmcli c mod $ETH2 ipv4.method manual ipv4.addresses ${VDC_SUBNET_A}.${cluid}.1.${ip}/24
+sudo nmcli c mod $ETH3 ipv4.method manual ipv4.addresses ${VDC_SUBNET_A}.${cluid}.2.${ip}/24
 
 sudo nmcli c show
 

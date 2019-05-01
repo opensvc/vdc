@@ -1,5 +1,12 @@
 #!/bin/bash
 
+echo
+echo "########################"
+echo "######## DOCKER ########"
+echo "########################"
+echo
+
+
 # bugfixes
 
 [[ -d /usr/libexec/docker ]] && {
@@ -39,7 +46,5 @@ sudo systemctl restart docker.service
 	/data/cni/cni.sh
     }
 }
-
-
 
 exit 0

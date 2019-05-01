@@ -1,6 +1,10 @@
 #!/bin/bash
 
-echo "QAbot key setup"
+echo
+echo "#######################"
+echo "######## QABOT ########"
+echo "#######################"
+echo
 
 [[ ! -d /root/.ssh ]] && mkdir /root/.ssh
 
