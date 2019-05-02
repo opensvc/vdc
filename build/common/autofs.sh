@@ -25,7 +25,7 @@ ${VMAUTOFSROOT}    /etc/auto.osvcdata    --ghost,--timeout=30
 /nfspool   /etc/auto.nfspool     --ghost,--timeout=30
 EOF
 
-NFSSRV=$(sudo ip route show dev br-prd | awk '{print $1}' | sed -e 's@0/24@1@')
+NFSSRV=$(sudo ip route show dev br-prd | grep "^${VDC_SUBNET_A}." | awk '{print $1}' | sed -e 's@0/24@1@')
 
 cat - <<EOF >|/etc/auto.osvcdata
 ${VMAUTOFSKEY} -fstype=nfs,ro,soft,actimeo=2,rsize=8192,wsize=8192   ${NFSSRV}:${VDC_ROOT}/share

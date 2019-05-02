@@ -10,7 +10,7 @@ echo
 
 # temporary static nfs mount during build (can not rely on vagrant facility with virtualbox provider)
 [[ ! -d /mnt ]] && mkdir /mnt
-NFSSRV=$(sudo ip route show dev br-prd | awk '{print $1}' | sed -e 's@0/24@1@')
+NFSSRV=$(sudo ip route show dev br-prd | grep "^${VDC_SUBNET_A}." | awk '{print $1}' | sed -e 's@0/24@1@')
 
 echo "NFS exports from server located at $NFSSRV :"
 sudo showmount -e $NFSSRV
@@ -20,7 +20,7 @@ grep -q "${VDC_ROOT}/share /mnt nfs" /proc/mounts && {
         umount /mnt
 }
 
-echo "Mounting ${NFSSRV}:${VDC_ROOT}/share} on /mnt"
+echo "Mounting ${NFSSRV}:${VDC_ROOT}/share on /mnt"
 sudo mount -o soft,ro,actimeo=2 ${NFSSRV}:${VDC_ROOT}/share /mnt
 
 echo "Configuring local yum nfs repos"
