@@ -10,13 +10,12 @@ vagrant_config = configs['configs'][configs['configs']['use']]
 hosts = {
 	  "infra-1" => {
 		    "memory" => 8192,
-                    "sshexpose" => 22001
+                    "sshexpose" => 20010
 	  },
 }
 
 Vagrant.configure("2") do |config|
         config.trigger.before [:up, :halt, :provision] do |trigger|
-                trigger.run = {inline: "cp /data/vdc/share/vdc.nodes ."}
                 trigger.run = {inline: "/data/vdc/build/common/update.etc.hosts.sh"}
         end
         config.vm.provision "shell", inline: "ln -sf /usr/bin/python3 /usr/bin/python"
@@ -41,7 +40,7 @@ Vagrant.configure("2") do |config|
                         machine.vm.network "public_network", bridge: "br-prd", auto_config: false
                         machine.vm.network "public_network", bridge: "br-hb0", auto_config: false
                         machine.vm.network "public_network", bridge: "br-hb1", auto_config: false
-                        machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"]
+                        machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], id: "ssh"
                         machine.vm.provider "virtualbox" do |v|
                                 v.memory = desc["memory"]
                                 v.name = "%s" % name
