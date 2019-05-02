@@ -9,162 +9,162 @@ configs        = YAML.load_file("#{current_dir}/../vagrant.osvc.config.yaml")
 vagrant_config = configs['configs'][configs['configs']['use']]
 
 hosts = {
-	"node1-1" => {
+	"c1n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-1",
                 "sshexpose" => 20111
 	},
-	"node2-1" => {
+	"c1n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-1",
                 "sshexpose" => 20112
 	},
-	"node1-2" => {
+	"c2n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-2",
                 "sshexpose" => 20211
 	},
-	"node2-2" => {
+	"c2n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-2",
                 "sshexpose" => 20212
 	},
-	"node1-3" => {
+	"c3n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-3",
                 "sshexpose" => 20311
 	},
-	"node2-3" => {
+	"c3n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-3",
                 "sshexpose" => 20312
 	},
-	"node1-4" => {
+	"c4n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-4",
                 "sshexpose" => 20411
 	},
-	"node2-4" => {
+	"c4n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-4",
                 "sshexpose" => 20412
 	},
-	"node1-5" => {
+	"c5n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-5",
                 "sshexpose" => 20511
 	},
-	"node2-5" => {
+	"c5n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-5",
                 "sshexpose" => 20512
 	},
-	"node1-6" => {
+	"c6n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-6",
                 "sshexpose" => 20611
 	},
-	"node2-6" => {
+	"c6n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-6",
                 "sshexpose" => 20612
 	},
-	"node1-7" => {
+	"c7n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-7",
                 "sshexpose" => 20711
 	},
-	"node2-7" => {
+	"c7n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-7",
                 "sshexpose" => 20712
 	},	
-	"node1-8" => {
+	"c8n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-8",
                 "sshexpose" => 20811
 	},
-	"node2-8" => {
+	"c8n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-8",
                 "sshexpose" => 20812
 	},
-	"node1-9" => {
+	"c9n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-9",
                 "sshexpose" => 20911
 	},
-	"node2-9" => {
+	"c9n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-9",
                 "sshexpose" => 20912
 	},
-	"node1-10" => {
+	"c10n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-10",
                 "sshexpose" => 21011
 	},
-	"node2-10" => {
+	"c10n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-10",
                 "sshexpose" => 21012
 	},
-	"node1-11" => {
+	"c11n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-11",
                 "sshexpose" => 21111
 	},
-	"node2-11" => {
+	"c11n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-11",
                 "sshexpose" => 21112
 	},
-	"node1-12" => {
+	"c12n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-12",
                 "sshexpose" => 21211
 	},
-	"node2-12" => {
+	"c12n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-12",
                 "sshexpose" => 21212
 	},
-	"node1-13" => {
+	"c13n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-13",
                 "sshexpose" => 21311
 	},
-	"node2-13" => {
+	"c13n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-13",
                 "sshexpose" => 21312
 	},
-	"node1-14" => {
+	"c14n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-14",
                 "sshexpose" => 21411
 	},
-	"node2-14" => {
+	"c14n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-14",
                 "sshexpose" => 21412
 	},
-	"node1-15" => {
+	"c15n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-15",
                 "sshexpose" => 21511
 	},
-	"node2-15" => {
+	"c15n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-15",
                 "sshexpose" => 21512
 	},
-	"node1-16" => {
+	"c16n1" => {
 		"memory" => 512,
 		"cluster" => "cluster-16",
                 "sshexpose" => 21611
 	},
-	"node2-16" => {
+	"c16n2" => {
 		"memory" => 512,
 		"cluster" => "cluster-16",
                 "sshexpose" => 21612
