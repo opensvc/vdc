@@ -13,63 +13,39 @@ set -a
 echo sudo nmcli c show
 echo sudo nmcli d show
 
-VDC_BRIDGE_LIST=${VDC_BRIDGE_LIST:-"prd hb1 hb2"}
-
-# delete network config
-typeset -i i=0
-for bridge in $VDC_BRIDGE_LIST
-do
-    echo sudo nmcli c del bridge-br-$bridge
-    echo sudo nmcli c del dummy-dummy$i
-    echo sudo ip link del dummy$i
-    let i=$i+1
-done
-
 # create network config
 
-VDC_SUBNET=${VDC_SUBNET:-"10.B.C.D"}
-
 # VDC_CLUSTER_IDX can go up to 255
-VDC_CLUSTER_IDX=${VDC_CLUSTER_IDX:-"30"}
+VDC_CLUSTER_IDX=${VDC_CLUSTER_IDX:-"29"}
 
 # to add new clusters id, update VDC_CLUSTER_IDX to the target value, and generate the commands
-# WARNING : to apply new ips, you just need to execute the 2 commands below
-# 1/ sudo nmcli c mod bridge-br-$bridge ipv4.method manual ipv4.addresses ..............list of ips..............
-# 2/ sudo nmcli c up bridge-br-$bridge
 
-typeset -i cpt=0
-for bridge in $VDC_BRIDGE_LIST
+for cid in $(seq 0 $VDC_CLUSTER_IDX)
 do
-    echo ----- bridge $bridge ----
-    echo sudo nmcli c add type dummy ifname dummy$cpt con-name dummy-dummy$cpt
-    echo sudo nmcli c mod dummy-dummy$cpt ipv4.method disabled
-    echo sudo nmcli c add type bridge ifname br-$bridge con-name bridge-br-$bridge
-    echo sudo nmcli c mod bridge-br-$bridge bridge.stp no
-    echo sudo nmcli c mod dummy-dummy$cpt connection.master br-$bridge connection.slave-type bridge
-    ## echo sudo nmcli c mod bridge-br-$bridge ipv4.method manual ipv4.addresses 192.168.10$cpt.1/24
-    typeset -i idx=0
-    ipstring=""
-    netA=$(echo $VDC_SUBNET | awk -F'.' '{print $1}')
-    while [[ $idx -lt $VDC_CLUSTER_IDX ]]
-    do
-	#if [[ $idx -eq 0 ]] && [[ $cpt -ne 0 ]]
-	#then
-	#	break
-	#fi
-	if [[ $netA.$idx.$cpt.1 != '10.0.1.1' ]] && [[ $netA.$idx.$cpt.1 != '10.0.2.1' ]]
-	then
-	    # do not add 10.0.[1,2].1 ip addr (owned by vbox)
-            ipstring="$ipstring,$netA.$idx.$cpt.1/24"
-        fi
-        let idx=$idx+1
-    done
-    ipstring=$(echo $ipstring | sed -e 's/^,//')
-    echo sudo nmcli c mod bridge-br-$bridge ipv4.method manual ipv4.addresses $ipstring
-    echo sudo nmcli c up bridge-br-$bridge
-    echo sudo nmcli c up dummy-dummy$cpt
-    let cpt=$cpt+1
+	for nid in 0 1 2
+	do
+		gw="10.${cid}.${nid}.1"
+		br="br-${cid}-${nid}"
+		dum="dum-${cid}-${nid}"
+		if test "$gw" = "10.0.1.1" -o "$gw" = "10.0.2.1"
+		then
+			continue
+		fi
+		echo "# $br"
+		echo sudo nmcli c del bridge-$br
+		echo sudo nmcli c del dummy-$dum
+		echo sudo ip link del $dum
+		echo
+		echo sudo nmcli c add type dummy ifname $dum con-name dummy-$dum
+		echo sudo nmcli c mod dummy-$dum ipv4.method disabled
+		echo sudo nmcli c add type bridge ifname $br con-name bridge-$br
+		echo sudo nmcli c mod bridge-$br bridge.stp no
+		echo sudo nmcli c mod dummy-$dum connection.master $br connection.slave-type bridge
+		echo sudo nmcli c mod bridge-$br ipv4.method manual ipv4.addresses $gw/24
+		echo sudo nmcli c up bridge-$br
+		echo sudo nmcli c up dummy-$dum
+	done
 done
-
 
 # sudo nmcli c add type ethernet ifname enp0s31f6 con-name enp0s31f6
 # sudo nmcli c mod enp0s31f6 connection.master br-prd connection.slave-type bridge
