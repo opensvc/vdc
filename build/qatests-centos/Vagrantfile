@@ -9,26 +9,20 @@ configs        = YAML.load_file("#{current_dir}/../vagrant.osvc.config.yaml")
 vagrant_config = configs['configs'][configs['configs']['use']]
 
 hosts = {
-	"qatestcentos7-50-1" => {
+	"qac7c17n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-50",
-                "sshexpose" => 22501
+		"cluster" => "17",
+                "sshexpose" => 21711
 	},
-	"qatestcentos7-50-2" => {
+	"qac7c17n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-50",
-                "sshexpose" => 22502
+		"cluster" => "17",
+                "sshexpose" => 21712
 	},
-#	"qatestcentos7-50-3" => {
-#		"memory" => 512,
-#		"cluster" => "cluster-50",
-#                "sshexpose" => 22503
-#	},
 }
 
 Vagrant.configure("2") do |config|
         config.trigger.before [:up, :halt, :provision] do |trigger|
-                trigger.run = {inline: "cp /data/vdc/share/vdc.nodes ."}
                 trigger.run = {inline: "/data/vdc/build/common/update.etc.hosts.sh"}
         end
 	config.vm.provision "ansible" do |ansible|
@@ -36,8 +30,8 @@ Vagrant.configure("2") do |config|
         end
         config.vm.provision "shell", path: "../common/ntp.sh"
         config.vm.provision "shell", path: "../common/net.sh"
-        config.vm.provision "shell", path: "../common/yum.sh", env: {"VDCBOXIP" => vagrant_config['vdcboxip'], "VDCBOXEXPORT" => vagrant_config['vdcboxexport']}
-        config.vm.provision "shell", path: "../common/autofs.sh", env: {"VDCBOXIP" => vagrant_config['vdcboxip'], "VDCBOXEXPORT" => vagrant_config['vdcboxexport'], "VMNFSROOT" => vagrant_config['vmnfsroot'], "VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
+        config.vm.provision "shell", path: "../common/yum.sh"
+        config.vm.provision "shell", path: "../common/autofs.sh", env: {"VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
 	config.vm.provision "shell", path: "../common/ssh.sh"
 	config.vm.provision "shell", path: "../common/md.sh"
         config.vm.provision "shell", path: "../common/docker.sh"
@@ -46,7 +40,8 @@ Vagrant.configure("2") do |config|
 	config.vm.provision "shell", path: "../common/alias.sh"
 	config.vm.provision "shell", path: "../common/selinux.sh"
 	config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
-	config.vm.provision "shell", path: "../common/qabot.ssh.key.sh"
+	config.vm.provision "shell", path: "../common/opensvc.ssh.key.sh"
+        config.vm.provision "shell", path: "../common/distrib.upgrade.sh"
 
 
 	hosts.each do |name, desc|
@@ -54,13 +49,15 @@ Vagrant.configure("2") do |config|
 			machine.vm.box = "bento/centos-7"
 			machine.vm.hostname = "%s" % name
                         machine.vm.network "private_network", :type => 'dhcp', :name => 'vboxnet0', :adapter => 2
-                        machine.vm.network "public_network", bridge: "br-prd", auto_config: false
-                        machine.vm.network "public_network", bridge: "br-hb0", auto_config: false
-                        machine.vm.network "public_network", bridge: "br-hb1", auto_config: false
+                        machine.vm.network "public_network", bridge: "br-%s-0" % desc["cluster"], auto_config: false
+                        machine.vm.network "public_network", bridge: "br-%s-1" % desc["cluster"], auto_config: false
+                        machine.vm.network "public_network", bridge: "br-%s-2" % desc["cluster"], auto_config: false
                         machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], id: "ssh"
                         machine.vm.provider "virtualbox" do |v|
+                                v.linked_clone = true
                                 v.memory = desc["memory"]
                                 v.name = "%s" % name
+                                v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
                                 v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
                                 v.customize ["modifyvm", :id, "--audio", "none"]
                                 #v.customize ["setproperty", "vrdeauthlibrary", "null"]

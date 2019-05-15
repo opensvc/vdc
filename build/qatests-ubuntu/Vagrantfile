@@ -8,27 +8,21 @@ configs        = YAML.load_file("#{current_dir}/../vagrant.osvc.config.yaml")
 vagrant_config = configs['configs'][configs['configs']['use']]
 
 hosts = {
-	"qatestubuntu-52-1" => {
+	"qau18c20n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-52",
-                "sshexpose" => 22521
+		"cluster" => "20",
+                "sshexpose" => 22011
 	},
-	"qatestubuntu-52-2" => {
+	"qau18c20n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-53",
-                "sshexpose" => 22522
+		"cluster" => "20",
+                "sshexpose" => 22012
 	},
-	#"qatestubuntu-52-3" => {
-	#	"memory" => 512,
-	#	"cluster" => "cluster-52",
-        #        "sshexpose" => 22523
-	#},
 }
 
 
 Vagrant.configure("2") do |config|
         config.trigger.before [:up, :halt, :provision] do |trigger|
-                trigger.run = {inline: "cp /data/vdc/share/vdc.nodes ."}
                 trigger.run = {inline: "/data/vdc/build/common/update.etc.hosts.sh"}
         end
         config.vm.provision "shell", inline: "ln -sf /usr/bin/python3 /usr/bin/python"
@@ -39,7 +33,7 @@ Vagrant.configure("2") do |config|
 	config.vm.provision "shell", path: "../common/ntp.sh"
 	config.vm.provision "shell", path: "../common/fix.ubuntu.dns.sh"
 	config.vm.provision "shell", path: "../common/net.sh"
-        config.vm.provision "shell", path: "../common/autofs.sh", env: {"VDCBOXIP" => vagrant_config['vdcboxip'], "VDCBOXEXPORT" => vagrant_config['vdcboxexport'], "VMNFSROOT" => vagrant_config['vmnfsroot'], "VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
+        config.vm.provision "shell", path: "../common/autofs.sh", env: {"VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
         config.vm.provision "shell", path: "../common/ssh.sh"
 	config.vm.provision "shell", path: "../common/md.sh"
 	config.vm.provision "shell", path: "../common/docker.sh"
@@ -47,9 +41,9 @@ Vagrant.configure("2") do |config|
         config.vm.provision "shell", path: "../common/user.sh", env: {"VAGRANTPASSWDBASE64HASH" => vagrant_config['vagrantpasswdbase64hash']}
         config.vm.provision "shell", path: "../common/alias.sh"
         config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
-        config.vm.provision "shell", path: "../common/qabot.ssh.key.sh"
+        config.vm.provision "shell", path: "../common/opensvc.ssh.key.sh"
         config.vm.provision "shell", path: "../common/distrib.upgrade.sh"
-        config.vm.provision "shell", path: "../common/make.python.links.sh"
+        #config.vm.provision "shell", path: "../common/make.python.links.sh"
 
 
 	hosts.each do |name, desc|
@@ -57,13 +51,15 @@ Vagrant.configure("2") do |config|
 			machine.vm.box = "bento/ubuntu-18.04"
 			machine.vm.hostname = "%s" % name
                         machine.vm.network "private_network", :type => 'dhcp', :name => 'vboxnet0', :adapter => 2
-                        machine.vm.network "public_network", bridge: "br-prd", auto_config: false
-                        machine.vm.network "public_network", bridge: "br-hb0", auto_config: false
-                        machine.vm.network "public_network", bridge: "br-hb1", auto_config: false
-                        machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"]
+                        machine.vm.network "public_network", bridge: "br-%s-0" % desc["cluster"], auto_config: false
+                        machine.vm.network "public_network", bridge: "br-%s-1" % desc["cluster"], auto_config: false
+                        machine.vm.network "public_network", bridge: "br-%s-2" % desc["cluster"], auto_config: false
+                        machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], id: "ssh"
                         machine.vm.provider "virtualbox" do |v|
+                                v.linked_clone = true
                                 v.memory = desc["memory"]
                                 v.name = "%s" % name
+                                v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
                                 v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
                                 v.customize ["modifyvm", :id, "--audio", "none"]
                                 #v.customize ["setproperty", "vrdeauthlibrary", "VboxAuth"]
