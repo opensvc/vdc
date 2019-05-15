@@ -40,7 +40,7 @@ Vagrant.configure("2") do |config|
         config.vm.provision "shell", path: "../common/alias.sh"
         config.vm.provision "shell", path: "../common/opensvc.sh"
         config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
-        config.vm.provision "shell", path: "../common/qabot.ssh.key.sh"
+        config.vm.provision "shell", path: "../common/opensvc.ssh.key.sh"
 
 	hosts.each do |name, desc|
 		config.vm.define name do |machine|
