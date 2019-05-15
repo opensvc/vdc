@@ -37,13 +37,12 @@ Vagrant.configure("2") do |config|
 			machine.vm.box = "generic/ubuntu1804"
 			machine.vm.hostname = "%s.vdc.opensvc.com" % name
                         machine.vm.network "private_network", :type => 'dhcp', :name => 'vboxnet0', :adapter => 2
-                        machine.vm.network "public_network", bridge: "br-prd", auto_config: false
-                        machine.vm.network "public_network", bridge: "br-hb0", auto_config: false
-                        machine.vm.network "public_network", bridge: "br-hb1", auto_config: false
+                        machine.vm.network "public_network", bridge: "br-0-0", auto_config: false
                         machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], id: "ssh"
                         machine.vm.provider "virtualbox" do |v|
                                 v.memory = desc["memory"]
                                 v.name = "%s" % name
+                                v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
                                 v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
                                 v.customize ["modifyvm", :id, "--audio", "none"]
                                 v.customize ["modifyvm", :id, "--vrde", "on"]
