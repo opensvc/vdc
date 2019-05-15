@@ -11,162 +11,162 @@ vagrant_config = configs['configs'][configs['configs']['use']]
 hosts = {
 	"c1n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-1",
+		"cluster" => "1",
                 "sshexpose" => 20111
 	},
 	"c1n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-1",
+		"cluster" => "1",
                 "sshexpose" => 20112
 	},
 	"c2n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-2",
+		"cluster" => "2",
                 "sshexpose" => 20211
 	},
 	"c2n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-2",
+		"cluster" => "2",
                 "sshexpose" => 20212
 	},
 	"c3n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-3",
+		"cluster" => "3",
                 "sshexpose" => 20311
 	},
 	"c3n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-3",
+		"cluster" => "3",
                 "sshexpose" => 20312
 	},
 	"c4n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-4",
+		"cluster" => "4",
                 "sshexpose" => 20411
 	},
 	"c4n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-4",
+		"cluster" => "4",
                 "sshexpose" => 20412
 	},
 	"c5n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-5",
+		"cluster" => "5",
                 "sshexpose" => 20511
 	},
 	"c5n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-5",
+		"cluster" => "5",
                 "sshexpose" => 20512
 	},
 	"c6n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-6",
+		"cluster" => "6",
                 "sshexpose" => 20611
 	},
 	"c6n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-6",
+		"cluster" => "6",
                 "sshexpose" => 20612
 	},
 	"c7n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-7",
+		"cluster" => "7",
                 "sshexpose" => 20711
 	},
 	"c7n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-7",
+		"cluster" => "7",
                 "sshexpose" => 20712
 	},	
 	"c8n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-8",
+		"cluster" => "8",
                 "sshexpose" => 20811
 	},
 	"c8n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-8",
+		"cluster" => "8",
                 "sshexpose" => 20812
 	},
 	"c9n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-9",
+		"cluster" => "9",
                 "sshexpose" => 20911
 	},
 	"c9n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-9",
+		"cluster" => "9",
                 "sshexpose" => 20912
 	},
 	"c10n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-10",
+		"cluster" => "10",
                 "sshexpose" => 21011
 	},
 	"c10n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-10",
+		"cluster" => "10",
                 "sshexpose" => 21012
 	},
 	"c11n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-11",
+		"cluster" => "11",
                 "sshexpose" => 21111
 	},
 	"c11n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-11",
+		"cluster" => "11",
                 "sshexpose" => 21112
 	},
 	"c12n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-12",
+		"cluster" => "12",
                 "sshexpose" => 21211
 	},
 	"c12n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-12",
+		"cluster" => "12",
                 "sshexpose" => 21212
 	},
 	"c13n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-13",
+		"cluster" => "13",
                 "sshexpose" => 21311
 	},
 	"c13n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-13",
+		"cluster" => "13",
                 "sshexpose" => 21312
 	},
 	"c14n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-14",
+		"cluster" => "14",
                 "sshexpose" => 21411
 	},
 	"c14n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-14",
+		"cluster" => "14",
                 "sshexpose" => 21412
 	},
 	"c15n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-15",
+		"cluster" => "15",
                 "sshexpose" => 21511
 	},
 	"c15n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-15",
+		"cluster" => "15",
                 "sshexpose" => 21512
 	},
 	"c16n1" => {
 		"memory" => 512,
-		"cluster" => "cluster-16",
+		"cluster" => "16",
                 "sshexpose" => 21611
 	},
 	"c16n2" => {
 		"memory" => 512,
-		"cluster" => "cluster-16",
+		"cluster" => "16",
                 "sshexpose" => 21612
 	},
 }
@@ -190,7 +190,7 @@ Vagrant.configure("2") do |config|
 	config.vm.provision "shell", path: "../common/alias.sh"
 	config.vm.provision "shell", path: "../common/selinux.sh"
 	config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
-	config.vm.provision "shell", path: "../common/qabot.ssh.key.sh"
+	config.vm.provision "shell", path: "../common/opensvc.ssh.key.sh"
         config.vm.provision "shell", path: "../common/distrib.upgrade.sh"
 
 
@@ -199,9 +199,9 @@ Vagrant.configure("2") do |config|
 			machine.vm.box = "bento/centos-7"
 			machine.vm.hostname = "%s" % name
                         machine.vm.network "private_network", :type => 'dhcp', :name => 'vboxnet0', :adapter => 2
-                        machine.vm.network "public_network", bridge: "br-prd", auto_config: false
-                        machine.vm.network "public_network", bridge: "br-hb1", auto_config: false
-                        machine.vm.network "public_network", bridge: "br-hb2", auto_config: false
+                        machine.vm.network "public_network", bridge: "br-%s-0" % desc["cluster"], auto_config: false
+                        machine.vm.network "public_network", bridge: "br-%s-1" % desc["cluster"], auto_config: false
+                        machine.vm.network "public_network", bridge: "br-%s-2" % desc["cluster"], auto_config: false
                         machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], id: "ssh"
                         machine.vm.provider "virtualbox" do |v|
                                 v.linked_clone = true
