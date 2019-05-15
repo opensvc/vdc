@@ -2,7 +2,7 @@
 
 set -a
 
-. ../../vdc.env
+. /data/vdc/vdc.env
 
 echo "Updating /etc/hosts with vdc nodes records"
 
