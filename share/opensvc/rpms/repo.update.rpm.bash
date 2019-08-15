@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for ver in 1.8 1.9
+for ver in 1.8 1.9 2.0
 do
 	test -d $ver || mkdir $ver
 	tmp=current.$ver.$$
@@ -17,5 +17,6 @@ do
 	# create the links used by "nodemgr updatepkg"
 	ln -sf $fname $ver/current
 	ln -sf $ver/$fname current-$ver
+	ln -sf $ver/$fname current-$ver.rpm
 done
 
