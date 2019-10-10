@@ -19,6 +19,11 @@ hosts = {
 		"cluster" => "1",
                 "sshexpose" => 20112
 	},
+	"c1n3" => {
+		"memory" => 512,
+		"cluster" => "1",
+                "sshexpose" => 20113
+	},
 	"c2n1" => {
 		"memory" => 512,
 		"cluster" => "2",
@@ -28,6 +33,11 @@ hosts = {
 		"memory" => 512,
 		"cluster" => "2",
                 "sshexpose" => 20212
+	},
+	"c2n3" => {
+		"memory" => 512,
+		"cluster" => "2",
+                "sshexpose" => 20213
 	},
 	"c3n1" => {
 		"memory" => 512,
@@ -109,6 +119,11 @@ hosts = {
 		"cluster" => "10",
                 "sshexpose" => 21012
 	},
+	"c10n3" => {
+		"memory" => 512,
+		"cluster" => "10",
+                "sshexpose" => 21013
+	},
 	"c11n1" => {
 		"memory" => 512,
 		"cluster" => "11",
@@ -172,6 +187,7 @@ hosts = {
 }
 
 Vagrant.configure("2") do |config|
+        config.vbguest.auto_update = false
         config.trigger.before [:up, :halt, :provision] do |trigger|
                 trigger.run = {inline: "../common/update.etc.hosts.sh"}
         end
@@ -180,6 +196,7 @@ Vagrant.configure("2") do |config|
         end
         config.vm.provision "shell", path: "../common/ntp.sh"
         config.vm.provision "shell", path: "../common/net.sh"
+        config.vm.provision "shell", path: "../common/setenv.sh"
         config.vm.provision "shell", path: "../common/yum.sh"
         config.vm.provision "shell", path: "../common/autofs.sh", env: {"VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
 	config.vm.provision "shell", path: "../common/ssh.sh"
