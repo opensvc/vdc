@@ -36,7 +36,7 @@ function gen_data()
         for key in ${!subnets[@]}
         do
 	    [[ $key == ${VDC_SUBNET_A}.${cluid}.* ]] && {
-                printf "%s.%s\t%s%s\n" "$key" "$ip" "$nodename" "${subnets[$key]}"
+                printf "%s.%s\t%s%s\t%s%s.vdc.opensvc.com\n" "$key" "$ip" "$nodename" "${subnets[$key]}" "$nodename" "${subnets[$key]}"
             }
         done
     done
