@@ -13,7 +13,7 @@ echo
 }
 
 [[ -f /etc/redhat-release ]] && {
-        yum -y upgrade
+        yum --assumeyes --exclude="kernel*" upgrade
 }
 
 exit 0
