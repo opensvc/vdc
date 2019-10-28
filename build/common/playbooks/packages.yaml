@@ -10,6 +10,8 @@
       state=latest
       name={{item}}
     with_items:
+    - autoconf
+    - automake
     - bash-completion
     - bridge-utils
     - git
@@ -50,6 +52,8 @@
         - multipath-tools
         - network-manager
         - open-iscsi
+        - python-crypto
+        - python-requests
         - python3-crypto
         - python3-requests
         - sg3-utils
@@ -117,6 +121,8 @@
         - lxc-templates
         - nfs-utils
         - ntpdate
+        - python2
+        - python2-requests
         - python36
         - python36-requests
         - python36-pycryptodomex
