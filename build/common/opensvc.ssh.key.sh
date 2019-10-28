@@ -6,7 +6,7 @@ echo "######## OPENSVC SSH KEYS ########"
 echo "##################################"
 echo
 
-[[ ! -d /root/.ssh ]] && mkdir /root/.ssh
+[[ ! -d /root/.ssh ]] && mkdir /root/.ssh && touch /root/.ssh/authorized_keys
 
 grep -q 'opensvc-qabot' /root/.ssh/authorized_keys || {
 
