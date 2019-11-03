@@ -49,6 +49,11 @@ hosts = {
 		"cluster" => "3",
                 "sshexpose" => 20312
 	},
+	"c3n3" => {
+		"memory" => 512,
+		"cluster" => "3",
+                "sshexpose" => 20313
+	},
 	"c4n1" => {
 		"memory" => 512,
 		"cluster" => "4",
@@ -58,6 +63,11 @@ hosts = {
 		"memory" => 512,
 		"cluster" => "4",
                 "sshexpose" => 20412
+	},
+	"c4n3" => {
+		"memory" => 512,
+		"cluster" => "4",
+                "sshexpose" => 20413
 	},
 	"c5n1" => {
 		"memory" => 512,
@@ -69,6 +79,11 @@ hosts = {
 		"cluster" => "5",
                 "sshexpose" => 20512
 	},
+	"c5n3" => {
+		"memory" => 512,
+		"cluster" => "5",
+                "sshexpose" => 20513
+	},
 	"c6n1" => {
 		"memory" => 512,
 		"cluster" => "6",
@@ -78,6 +93,11 @@ hosts = {
 		"memory" => 512,
 		"cluster" => "6",
                 "sshexpose" => 20612
+	},
+	"c6n3" => {
+		"memory" => 512,
+		"cluster" => "6",
+                "sshexpose" => 20613
 	},
 	"c7n1" => {
 		"memory" => 512,
@@ -89,6 +109,11 @@ hosts = {
 		"cluster" => "7",
                 "sshexpose" => 20712
 	},	
+	"c7n3" => {
+		"memory" => 512,
+		"cluster" => "7",
+                "sshexpose" => 20713
+	},	
 	"c8n1" => {
 		"memory" => 512,
 		"cluster" => "8",
@@ -99,6 +124,11 @@ hosts = {
 		"cluster" => "8",
                 "sshexpose" => 20812
 	},
+	"c8n3" => {
+		"memory" => 512,
+		"cluster" => "8",
+                "sshexpose" => 20813
+	},
 	"c9n1" => {
 		"memory" => 512,
 		"cluster" => "9",
@@ -108,6 +138,11 @@ hosts = {
 		"memory" => 512,
 		"cluster" => "9",
                 "sshexpose" => 20912
+	},
+	"c9n3" => {
+		"memory" => 512,
+		"cluster" => "9",
+                "sshexpose" => 20913
 	},
 	"c10n1" => {
 		"memory" => 512,
@@ -123,67 +158,7 @@ hosts = {
 		"memory" => 512,
 		"cluster" => "10",
                 "sshexpose" => 21013
-	},
-	"c11n1" => {
-		"memory" => 512,
-		"cluster" => "11",
-                "sshexpose" => 21111
-	},
-	"c11n2" => {
-		"memory" => 512,
-		"cluster" => "11",
-                "sshexpose" => 21112
-	},
-	"c12n1" => {
-		"memory" => 512,
-		"cluster" => "12",
-                "sshexpose" => 21211
-	},
-	"c12n2" => {
-		"memory" => 512,
-		"cluster" => "12",
-                "sshexpose" => 21212
-	},
-	"c13n1" => {
-		"memory" => 512,
-		"cluster" => "13",
-                "sshexpose" => 21311
-	},
-	"c13n2" => {
-		"memory" => 512,
-		"cluster" => "13",
-                "sshexpose" => 21312
-	},
-	"c14n1" => {
-		"memory" => 512,
-		"cluster" => "14",
-                "sshexpose" => 21411
-	},
-	"c14n2" => {
-		"memory" => 512,
-		"cluster" => "14",
-                "sshexpose" => 21412
-	},
-	"c15n1" => {
-		"memory" => 512,
-		"cluster" => "15",
-                "sshexpose" => 21511
-	},
-	"c15n2" => {
-		"memory" => 512,
-		"cluster" => "15",
-                "sshexpose" => 21512
-	},
-	"c16n1" => {
-		"memory" => 512,
-		"cluster" => "16",
-                "sshexpose" => 21611
-	},
-	"c16n2" => {
-		"memory" => 512,
-		"cluster" => "16",
-                "sshexpose" => 21612
-	},
+	}
 }
 
 Vagrant.configure("2") do |config|
@@ -209,6 +184,7 @@ Vagrant.configure("2") do |config|
 	config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
 	config.vm.provision "shell", path: "../common/opensvc.ssh.key.sh"
         config.vm.provision "shell", path: "../common/distrib.upgrade.sh"
+        config.vm.provision "shell", path: "../common/ssl.sh"
 
 
 	hosts.each do |name, desc|
@@ -224,6 +200,7 @@ Vagrant.configure("2") do |config|
                                 v.linked_clone = true
                                 v.memory = desc["memory"]
                                 v.name = "%s" % name
+                                v.customize ["modifyvm", :id, "--macaddress1", "auto"]
                                 v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
                                 v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
                                 v.customize ["modifyvm", :id, "--audio", "none"]
