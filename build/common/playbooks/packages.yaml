@@ -53,8 +53,10 @@
         - network-manager
         - open-iscsi
         - python-crypto
+        - python-cryptography
         - python-requests
         - python3-crypto
+        - python3-cryptography
         - python3-requests
         - sg3-utils
     when: (ansible_facts['distribution'] == "Ubuntu" ) or
@@ -123,9 +125,11 @@
         - ntpdate
         - python2
         - python2-requests
+        - python2-cryptography
         - python36
         - python36-requests
         - python36-pycryptodomex
+        - python36-cryptography
         - sg3_utils
     when: (ansible_facts['distribution'] == "CentOS" ) or
           (ansible_facts['distribution'] == "RHEL" )
