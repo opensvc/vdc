@@ -1,0 +1,136 @@
+#!/bin/bash
+
+#declare -A hashmap
+#hashmap["key"]="value"
+#hashmap["key2"]="value2"
+#echo "${hashmap["key"]}"
+#for key in ${!hashmap[@]}; do echo key $key; done
+#for value in ${hashmap[@]}; do echo value $value; done
+#echo hashmap has ${#hashmap[@]} elements
+
+
+VAGRANT_PRJ=$1
+shift 
+
+[ -z "$VAGRANT_PRJ" ] && {
+	echo "VAGRANT_PRJ must be set" >&2
+	exit 1
+}
+
+cd $VAGRANT_PRJ 2>/dev/null || exit 1
+
+typeset -A vagrantvms
+OUTF=/tmp/vagrant.out
+
+function getvmlist  {
+	cat $OUTF | awk '{print $1}'
+	#ret=$(cat $OUTF | awk '{print $1}')
+	#echo "$ret"
+}
+
+function getstate  {
+	grep -w $1 $OUTF | awk '{print $2}'
+}
+
+function refresh {
+	rm -f $OUTF
+	[ ! -f $OUTF ] && { 
+	    vagrant status|grep '(virtualbox)' > $OUTF
+        }
+	#cat $OUTF | while read vm state provider
+        #do
+	#    echo "VM ${vm}    STATE ${state}"
+	#    vagrantvms["${vm}"]="$state"
+	#done
+
+	#for vm in "${!vagrantvms[@]}"
+        #do
+	#    echo --- go ---
+	#    echo "hashmap  vm $vm - state ${vagrantvms[$vm]}"
+        #done
+
+}
+
+function status {
+	#set -x
+	typeset -i ret=0
+	typeset -i vmcount=0
+	typeset -i shutoff=0
+	typeset -i running=0
+	for vm in $(getvmlist)
+	do
+		vmcount=$(echo $vmcount+1|bc -l)
+		status=$(getstate $vm)
+		if [ "$status" == "shutoff" ]; then
+		    shutoff=$(echo $shutoff+1|bc -l)
+	        fi
+		if [ "$status" == "running" ]; then
+		    running=$(echo $running+1|bc -l)
+	        fi
+		if [ "$status" != "running" ]; then
+		    ret=$(echo $ret+1|bc -l)
+	        fi
+		echo --- ret=$ret status $vm is $status ---
+	done
+	if [ $shutoff -eq $vmcount ]
+	then
+	    return 1
+        fi
+	if [ $running -eq 0 ]
+	then
+	    return 1
+	fi
+	if [ $ret -ne 0 ]
+	then
+	    return 2
+	fi
+	return $ret
+}
+
+function wait_for_down {
+        for i in 1 2 3 4 5
+	do
+		status || return 0
+		sleep 1
+	done
+	status || return 0
+	echo "still not down after 5 seconds" >&2
+	return 1
+}
+
+refresh
+
+case $1 in
+restart)
+        stop
+        start
+        ;;
+start)
+        status && {
+                echo "already started"
+                exit 0
+        }
+	for vm in $(getvmlist)
+	do
+		echo --- starting $vm ---
+		vagrant up $vm
+	done
+        ;;
+stop)
+	for vm in $(getvmlist)
+	do
+		echo --- stopping $vm ---
+		vagrant halt $vm
+	done
+        ;;
+info)
+        echo "Name: $DAEMON"
+        ;;
+status)
+	status
+        exit $?
+        ;;
+*)
+	exit 1
+	;;
+esac
