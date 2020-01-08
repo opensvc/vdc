@@ -13,6 +13,7 @@ echo
 }
 
 [[ -f /etc/redhat-release ]] && {
+	which dnf >> /dev/null 2>&1 && dnf upgrade --allowerasing --assumeyes --exclude="kernel*" && exit 0
         yum --assumeyes --exclude="kernel*" upgrade
 }
 
