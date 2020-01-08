@@ -1,7 +1,7 @@
 ### Name: ELRepo.org Community Enterprise Linux Repository for el7
 ### URL: http://elrepo.org/
 
-[elrepo]
+[elrepo7]
 name=ELRepo.org Community Enterprise Linux Repository - el7
 baseurl=http://elrepo.org/linux/elrepo/el7/$basearch/
 	http://mirrors.coreix.net/elrepo/elrepo/el7/$basearch/
@@ -14,7 +14,7 @@ gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-elrepo.org
 protect=0
 
-[elrepo-testing]
+[elrepo7-testing]
 name=ELRepo.org Community Enterprise Linux Testing Repository - el7
 baseurl=http://elrepo.org/linux/testing/el7/$basearch/
 	http://mirrors.coreix.net/elrepo/testing/el7/$basearch/
@@ -27,7 +27,7 @@ gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-elrepo.org
 protect=0
 
-[elrepo-kernel]
+[elrepo7-kernel]
 name=ELRepo.org Community Enterprise Linux Kernel Repository - el7
 baseurl=http://elrepo.org/linux/kernel/el7/$basearch/
 	http://mirrors.coreix.net/elrepo/kernel/el7/$basearch/
@@ -40,7 +40,7 @@ gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-elrepo.org
 protect=0
 
-[elrepo-extras]
+[elrepo7-extras]
 name=ELRepo.org Community Enterprise Linux Extras Repository - el7
 baseurl=http://elrepo.org/linux/extras/el7/$basearch/
 	http://mirrors.coreix.net/elrepo/extras/el7/$basearch/
