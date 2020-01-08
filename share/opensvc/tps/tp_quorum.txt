@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------------
+
+# remove all hearbeats except unicast hb
+node-X-1# nodemgr edit config
+node-X-1# nodemgr daemon restart
+from node-X-2, rejoin the cluster to get the hb config modifications
+=> check in svcmon for hearbeats list
+
+---------------------------------------------------------------------------------
+
+# configure a relay heartbeat
+# 
+node-X-1# nodemgr set --kw hb#5.type=relay --kw hb#5.relay=192.168.100.37 --kw hb#5.timeout=10 --kw hb#5.secret=5b426f08a51511e8afe7525400a222b4
+node-X-1# nodemgr daemon restart
+from node-X-2, rejoin the cluster to get the hb config modifications
+=> check in svcmon for hearbeats list, verify relay hb is ok
+
+---------------------------------------------------------------------------------
+
+# reconfigure unicast hb
+1/ remove the unicast heartbeat
+node-X-1# nodemgr edit config    [and remove the hb lines]
+node-X-1# nodemgr daemon restart
+from node-X-2, rejoin the cluster to get the hb config modifications
+=> check in svcmon for hearbeats list
+
+2/ add the unicast hb (ensure it is on the production interface of peer node)
+node-X-1# nodemgr set --kw hb#5.type=unicast --kw hb#5.addr@node-X-1=192.168.100.a --kw hb#5.addr@node-X-2=192.168.100.b
+node-X-1# nodemgr daemon restart
+from node-X-2, rejoin the cluster to get the hb config modifications
+=> check in svcmon for hearbeats list
+=> check that the socket is using production network => lsof -nPi TCP:10000
+
+---------------------------------------------------------------------------------
+
+- configure quorum server
+# nodemgr set --param cluster.quorum --value true
+# nodemgr set --param arbitrator#1.name --value 192.168.100.37
+# nodemgr set --param arbitrator#1.secret --value XXXXXXX  (on node-9-3 server : # nodemgr get --param cluster.secret)
+
+On other node :
+- join the cluster
+#1 nodemgr daemon join --node node-X-1 --secret XXXXXXX (first node : # nodemgr get --param cluster.secret)
+
+- check setup : 
+# svcmon     (Arbitrators section)
+# nodemgr daemon status --format json --color yes | less -R
+---------------------------------------------------------------------------------
+
+# Scenario 
+###########
+# node-X-1 is isolated from quorum server and node-X-2
+# node-X-2 takeover the services
+
+# step 1 
+node-X-1# iptables -L   # should be empty
+node-X-1# iptables -A OUTPUT -d *IP*node-X-2-prd -j DROP    # drop outgoing traffic to node-X-2
+node-X-1# iptables -A INPUT -d *IP*node-X-2-prd -j DROP    # drop incoming traffic from node-X-2
+=> cluster health check
+
+# step 2
+node-X-1# iptables -A OUTPUT -d 192.168.100.37 -j DROP    # drop outgoing traffic to arbitrator node-X-3
+
+# wait a few seconds
+node-X-1 is crashed, cluster is split, election, service are failing over to node-X-2
+node-X-2# nodemgr logs | grep -E "stale|split"
+=> please ask us to restart the crashed node

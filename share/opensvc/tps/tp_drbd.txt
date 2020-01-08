@@ -1,0 +1,67 @@
+
+# create local disk (loopback)
+# both nodes
+dd if=/dev/urandom of=/root/loopback.file bs=1024k count=50
+losetup /dev/loop10 /root/loopback.file
+pvcreate /dev/loop10
+vgcreate drbdvg /dev/loop10
+
+# node-X-1
+vgchange --addtag @node-X-1 drbdvg
+
+# node-X-2
+vgchange --addtag @node-X-2 drbdvg
+
+# both nodes
+lvcreate -L512M -n drbdlv drbdvg
+
+
+# both nodes
+systemctl status drbd   # note the disabled status
+
+# both nodes
+# create drbd resource
+cat << EOF > /etc/drbd.d/osvttstdrbd1.res
+resource osvttstdrbd1 {
+    device /dev/drbd10;
+    disk /dev/drbdvg/drbdlv;
+    on node-X-1 {
+        address 1.2.3.4:31234;
+        meta-disk internal;
+    }
+    on node-X-2 {
+        address 4.3.2.1:31234;
+        meta-disk internal;
+    }
+}
+EOF
+
+# both nodes
+drbd-overview  # or drbdtop
+drbdadm create-md osvttstdrbd1
+drbd-overview
+drbdadm up osvttstdrbd1
+
+# on pri node node-X-1
+drbdadm primary --force osvttstdrbd1
+# AND immediately issue a query
+watch -n2 drbd-overview
+drbdtop
+
+# on pri node node-X-1
+# configure opensvc service
+svcmgr -s testdrbd create --config /data/opensvc/templates/hosted.drbd.19.template
+svcmgr -s testdrbd print status  # note and explain P and S flags
+svcmgr -s testdrbd provision
+tail -200 /var/log/opensvc/testdrbd.log
+
+svcmgr -s testdrbd switch
+
+# on pri node
+svcmgr -s testdrbd get --kw DEFAULT.orchestrate
+
+# on slave node
+svcmgr -s testdrbd set --kw DEFAULT.orchestrate=ha
+
+# on pri node
+svcmgr -s testdrbd get --kw DEFAULT.orchestrate

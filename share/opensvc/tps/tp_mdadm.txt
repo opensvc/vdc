@@ -1,0 +1,97 @@
+
+# have a look at template
+cat /data/opensvc/templates/md.19.template
+
+# on one node
+svcmgr -s testmdadm create --provision --config /data/opensvc/templates/md.19.template --env devs="/dev/mapper/36589cfc00000020e275f58e7f83f2ff6 /dev/mapper/36589cfc000000393ef14ff28af14b3d1 /dev/mapper/36589cfc000000311333660c59fb59f9f /dev/mapper/36589cfc0000004f6101d5283c16885fb"
+svcmgr -s testmdadm print status -r   # wait for service being completely provisioned
+
+# on passive node
+svcmgr -s testmdadm takeover
+svcmgr -s testmdadm print status -r
+svcmgr -s testmdadm giveback
+
+# set fs monitored
+svcmgr -s testmdadm set --kw fs#01.monitor=true
+svcmgr -s testmdadm set --kw DEFAULT.monitor_action=crash
+
+# remove one path
+array unmap iscsi zvol --name userX_disk2       --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+svcmgr -s testmdadm print status -r
+mdadm --detail /dev/mdXXX
+multipath -l    # first leg is failed
+
+# remove other path
+array unmap iscsi zvol --name userX_disk2       --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+svcmgr -s testmdadm print status -r    # md should be degraded
+mdadm --detail /dev/mdXXX
+multipath -l    # second leg is failed
+
+# cleanup
+scsi-rescan -r
+
+# add both path
+array map iscsi zvol --name userX_disk2 --lun 2 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+array map iscsi zvol --name userX_disk2 --lun 2 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.2
+scsi-rescan
+multipath -l
+
+# resync md device
+svcmgr -s testmdadm print status -r    # md should be degraded
+svcmgr -s testmdadm sync resync
+svcmgr -s testmdadm print status -r 
+
+
+
+##################
+# ARRAY COMMANDS #
+##################
+#  --- UNMAP ---
+# unmap disk2 lun 2
+array unmap iscsi zvol --name userX_disk2 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+array unmap iscsi zvol --name userX_disk2 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.2
+array unmap iscsi zvol --name userX_disk2 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.1
+array unmap iscsi zvol --name userX_disk2 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.2
+
+# unmap disk3 lun 3
+array unmap iscsi zvol --name userX_disk3 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+array unmap iscsi zvol --name userX_disk3 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.2
+array unmap iscsi zvol --name userX_disk3 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.1
+array unmap iscsi zvol --name userX_disk3 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.2
+
+# unmap disk4 lun 4
+array unmap iscsi zvol --name userX_disk4 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+array unmap iscsi zvol --name userX_disk4 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.2
+array unmap iscsi zvol --name userX_disk4 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.1
+array unmap iscsi zvol --name userX_disk4 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.2
+
+# unmap disk5 lun 5
+array unmap iscsi zvol --name userX_disk5 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+array unmap iscsi zvol --name userX_disk5 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.2
+array unmap iscsi zvol --name userX_disk5 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.1
+array unmap iscsi zvol --name userX_disk5 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.2
+
+#  --- MAP ---
+# map disk2 lun 2
+array map iscsi zvol --name userX_disk2 --lun=2 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+array map iscsi zvol --name userX_disk2 --lun=2 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.2
+array map iscsi zvol --name userX_disk2 --lun=2 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.1
+array map iscsi zvol --name userX_disk2 --lun=2 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.2
+
+# map disk3 lun 3
+array map iscsi zvol --name userX_disk3 --lun=3 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+array map iscsi zvol --name userX_disk3 --lun=3 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.2
+array map iscsi zvol --name userX_disk3 --lun=3 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.1
+array map iscsi zvol --name userX_disk3 --lun=3 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.2
+
+# map disk4 lun 4
+array map iscsi zvol --name userX_disk4 --lun=4 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+array map iscsi zvol --name userX_disk4 --lun=4 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.2
+array map iscsi zvol --name userX_disk4 --lun=4 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.1
+array map iscsi zvol --name userX_disk4 --lun=4 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.2
+
+# map disk5 lun 5
+array map iscsi zvol --name userX_disk5 --lun=5 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.1
+array map iscsi zvol --name userX_disk5 --lun=5 --mappings iqn.2009-11.com.opensvc.srv:node-X-1.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-1.storage.target.2
+array map iscsi zvol --name userX_disk5 --lun=5 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.1
+array map iscsi zvol --name userX_disk5 --lun=5 --mappings iqn.2009-11.com.opensvc.srv:node-X-2.storage.initiator:iqn.2009-11.com.opensvc.srv:node-X-2.storage.target.2
