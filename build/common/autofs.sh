@@ -51,11 +51,24 @@ sudo systemctl restart autofs.service
     # switch to autofs repos
     yum clean all
     rm -rf /var/cache/yum/* /etc/yum.repos.d/*
-    sudo yum-config-manager -q --add-repo file:///data/repos/centos/7/base
-    sudo yum-config-manager -q --add-repo file:///data/repos/centos/7/extras
-    sudo yum-config-manager -q --add-repo file:///data/repos/centos/7/updates
-    sudo yum-config-manager -q --add-repo file:///data/repos/epel/7
-    sudo yum-config-manager -q --add-repo file:///data/repos/elrepo/7
+    MAJOR_VERSION=$(grep ^VERSION_ID /etc/os-release | awk -F= '{print $2}' | sed -e 's/"//g')
+
+    [[ ${MAJOR_VERSION} -eq 7 ]] && {
+        sudo yum-config-manager -q --add-repo file:///data/repos/centos/${MAJOR_VERSION}/base
+        sudo yum-config-manager -q --add-repo file:///data/repos/centos/${MAJOR_VERSION}/extras
+        sudo yum-config-manager -q --add-repo file:///data/repos/centos/${MAJOR_VERSION}/updates
+        sudo yum-config-manager -q --add-repo file:///data/repos/epel/${MAJOR_VERSION}
+        sudo yum-config-manager -q --add-repo file:///data/repos/elrepo/${MAJOR_VERSION}
+    }
+
+    [[ ${MAJOR_VERSION} -eq 8 ]] && {
+        sudo yum-config-manager -q --add-repo file:///data/repos/centos/${MAJOR_VERSION}/BaseOS
+        sudo yum-config-manager -q --add-repo file:///data/repos/centos/${MAJOR_VERSION}/extras
+        sudo yum-config-manager -q --add-repo file:///data/repos/centos/${MAJOR_VERSION}/AppStream
+        sudo yum-config-manager -q --add-repo file:///data/repos/epel/${MAJOR_VERSION}
+        sudo yum-config-manager -q --add-repo file:///data/repos/elrepo/${MAJOR_VERSION}
+    }
+
     sudo yum repolist
 }
 
