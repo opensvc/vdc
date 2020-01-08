@@ -1,0 +1,14 @@
+config: {}
+networks: []
+storage_pools: []
+profiles:
+- config: {}
+  description: ""
+  devices:
+    eth0:
+      name: eth0
+      nictype: bridged
+      parent: br-prd
+      type: nic
+  name: default
+cluster: null
