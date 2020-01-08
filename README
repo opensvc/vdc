@@ -65,30 +65,58 @@ echo mkdir -p /data/vdc/pool
 
 # repos
 echo sudo apt install yum-utils createrepo
-echo sudo mkdir -p /data/vdc/share/repos/centos/7/{base,centosplus,extras,updates}
-echo sudo mkdir -p /data/vdc/share/repos/epel/7
-echo sudo mkdir -p /data/vdc/share/repos/elrepo/7
-echo cd /data/vdc/share/repos
-echo sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=base \
-  --newest-only --delete --downloadcomps --download-metadata \
-  --download_path=/data/vdc/share/repos/centos/7/
-echo sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=extras \
-  --newest-only --delete --downloadcomps --download-metadata \
-  --download_path=/data/vdc/share/repos/centos/7/
-echo sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=updates \
-  --newest-only --delete --downloadcomps --download-metadata \
-  --download_path=/data/vdc/share/repos/centos/7/
-echo sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=epel \
-  --newest-only --delete --downloadcomps --download-metadata \
-  --download_path=/data/vdc/share/repos/epel/7/
-echo sudo reposync --config=/data/vdc/share/repos/yum/yum.conf --plugins --repoid=elrepo \
-  --newest-only --delete --downloadcomps --download-metadata \
-  --download_path=/data/vdc/share/repos/elrepo/7/
-echo sudo createrepo /data/vdc/share/repos/centos/7/base/ -g comps.xml
-echo sudo createrepo /data/vdc/share/repos/centos/7/extras/
-echo sudo createrepo /data/vdc/share/repos/centos/7/updates/
-echo sudo createrepo /data/vdc/share/repos/epel/7/
-echo sudo createrepo /data/vdc/share/repos/elrepo/7/
+    # centos7
+    echo sudo mkdir -p /data/vdc/share/repos/centos/7/{base,centosplus,extras,updates}
+    echo sudo mkdir -p /data/vdc/share/repos/epel/7
+    echo sudo mkdir -p /data/vdc/share/repos/elrepo/7
+    echo cd /data/vdc/share/repos
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.7.conf --plugins --repoid=base \
+      --newest-only --delete --downloadcomps --download-metadata \
+      --download_path=/data/vdc/share/repos/centos/7/
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.7.conf --plugins --repoid=extras \
+      --newest-only --delete --downloadcomps --download-metadata \
+      --download_path=/data/vdc/share/repos/centos/7/
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.7.conf --plugins --repoid=updates \
+      --newest-only --delete --downloadcomps --download-metadata \
+      --download_path=/data/vdc/share/repos/centos/7/
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.7.conf --plugins --repoid=epel \
+      --newest-only --delete --downloadcomps --download-metadata \
+      --download_path=/data/vdc/share/repos/epel/7/
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.7.conf --plugins --repoid=elrepo \
+      --newest-only --delete --downloadcomps --download-metadata \
+      --download_path=/data/vdc/share/repos/elrepo/7
+    echo sudo createrepo /data/vdc/share/repos/centos/7/base/ -g comps.xml
+    echo sudo createrepo /data/vdc/share/repos/centos/7/extras/
+    echo sudo createrepo /data/vdc/share/repos/centos/7/updates/
+    echo sudo createrepo /data/vdc/share/repos/epel/7/
+    echo sudo createrepo /data/vdc/share/repos/elrepo/7/
+
+    # centos8 (createrepo not needed)
+    echo sudo mkdir -p /data/vdc/share/repos/centos/8/{BaseOS,extras,AppStream}
+    echo sudo mkdir -p /data/vdc/share/repos/epel/8
+    echo sudo mkdir -p /data/vdc/share/repos/elrepo/8
+    echo cd /data/vdc/share/repos
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.8.conf --plugins --repoid=BaseOS \
+      --newest-only --delete --downloadcomps --download-metadata \
+      --download_path=/data/vdc/share/repos/centos/8/
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.8.conf --plugins --repoid=extras \
+      --newest-only --delete --downloadcomps --download-metadata \
+      --download_path=/data/vdc/share/repos/centos/8/
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.8.conf --plugins --repoid=AppStream \
+      --newest-only --delete --downloadcomps --download-metadata \
+      --download_path=/data/vdc/share/repos/centos/8/
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.8.conf --plugins --repoid=epel \
+      --newest-only --delete --downloadcomps --download-metadata \
+      --download_path=/data/vdc/share/repos/epel/8/
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.8.conf --plugins --repoid=elrepo8 \
+      --newest-only --delete --downloadcomps --download-metadata \
+      --download_path=/data/vdc/share/repos/elrepo/8
+    echo sudo createrepo /data/vdc/share/repos/centos/8/BaseOS/ -g comps.xml
+    echo sudo createrepo /data/vdc/share/repos/centos/8/extras/
+    echo sudo createrepo /data/vdc/share/repos/centos/8/AppStream/
+    echo sudo createrepo /data/vdc/share/repos/epel/8/
+    echo sudo createrepo /data/vdc/share/repos/elrepo/8/
+
 
 # provision lab vm
 echo cd /data/vdc/build/lab
@@ -104,3 +132,11 @@ echo vagrant destroy
 # vboxmanage showvminfo vm-name
 # vboxmanage list hdds      # liste les disques de la database vagrant
 # vboxmanage closemedium disk eb42735a-980c-4da5-9ae4-95c5ff48b1bb --delete  # retire un disque de la database vagrant
+
+# vbox upgrade
+# ----------------------
+# stop all running vms
+# apt install ./virtualbox-6.0_6.0.12-133076~Ubuntu~bionic_amd64.deb
+# check with vboxmanage --version
+# vboxmanage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-6.0.12.vbox-extpack
+
