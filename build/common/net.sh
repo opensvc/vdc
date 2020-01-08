@@ -106,6 +106,7 @@ nmcli c show | grep -q $bridge || {
 sudo nmcli c mod $bridge bridge.stp no
 sudo nmcli c mod $bridge ipv4.method manual ipv4.addresses ${VDC_SUBNET_A}.${cluid}.0.${ip}/24
 sudo nmcli c mod $bridge ipv4.routes "192.168.99.0/24 ${VDC_SUBNET_A}.${cluid}.0.1"
+sudo nmcli c mod $bridge +ipv4.routes "192.168.200.0/24 ${VDC_SUBNET_A}.${cluid}.0.1"
 
 sudo nmcli c mod $ETH0 ipv4.method auto
 sudo nmcli c mod $ETH1 connection.master br-prd connection.slave-type bridge
