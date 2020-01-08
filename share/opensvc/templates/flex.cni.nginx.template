@@ -1,0 +1,20 @@
+[DEFAULT]
+nodes = {clusternodes}
+topology = flex
+flex_min_nodes = {#nodes}
+orchestrate = ha
+placement = shift
+docker_daemon_private = False
+scale = 10
+
+[ip#0]
+type = cni
+network = weave
+container_rid = container#0
+expose = 80/tcp
+
+[container#0]
+type = docker
+run_image = nginx:latest
+run_args = --net=none -i -t
+hostname = web

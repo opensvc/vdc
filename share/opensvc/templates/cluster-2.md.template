@@ -1,0 +1,68 @@
+[DEFAULT]
+orchestrate = ha
+nodes = node-2-1 node-2-2
+
+[ip#0]
+ipname = 128.1.11.1
+netmask = 32
+ipdev = lo
+
+[subset#disk:g1]
+parallel = false
+
+[subset#disk:g2]
+parallel = false
+
+[subset#disk:g3]
+parallel = false
+
+[disk#10]
+type = md
+subset = g1
+scsireserv = true
+level = raid1
+devs = {env.devs[0]} {env.devs[1]}
+uuid = 
+shared = true
+
+[disk#11]
+type = md
+subset = g2
+scsireserv = true
+level = raid1
+devs = {env.devs[2]} {env.devs[3]}
+uuid = 
+shared = true
+
+[disk#12]
+type = md
+subset = g3
+level = raid0
+devs = {disk#10.exposed_devs[0]} {disk#11.exposed_devs[0]}
+uuid = 
+shared = true
+
+[disk#30]
+type = vg
+vgname = {svcname}
+subset = g3
+pvs = {disk#12.exposed_devs[0]}
+shared = true
+
+[fs#01]
+dev = /dev/{svcname}/lv01
+mnt = /srv/{svcname}/lv01
+type = ext4
+size = 10m
+vg = {svcname}
+shared = true
+
+[env]
+owner = vagrant
+devs =
+	/dev/mapper/360014051e5935959abb449c8e89b9cb2
+	/dev/mapper/36001405e6e03eb4240841afb186dcae2
+	/dev/mapper/36001405922d2a0c152e4e96ae565e2d4
+	/dev/mapper/360014055cf9b9633b3948ddb655fa607
+
+

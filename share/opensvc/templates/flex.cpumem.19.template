@@ -1,0 +1,72 @@
+[DEFAULT]
+env = PRD
+monitor_action = freezestop
+nodes = {clusternodes}
+cluster_type = flex
+flex_min_nodes = 2
+orchestrate = ha
+
+[ip#0]
+ipname = 128.1.1.{env.idx}
+ipdev = lo
+netmask = 32
+
+[disk#0]
+type = loop
+file = {env.basedir}/{svcname}.img
+size = 30m
+
+[disk#1]
+type = lvm
+vgname = {svcname}
+pvs = {disk#0.file}
+
+[fs#0]
+mnt = {env.basedir}/{svcname}
+type = ext3
+dev = /dev/{svcname}/root
+size = 3M
+vg = {svcname}
+
+[fs#1]
+mnt = {env.basedir}/{svcname}/app
+type = ext3
+dev = /dev/{svcname}/app
+size = 10M
+vg = {svcname}
+
+[fs#2]
+mnt = {env.basedir}/{svcname}/data
+type = ext3
+dev = /dev/{svcname}/data
+size = 3M
+vg = {svcname}
+
+[app#1]
+pre_provision = cp /data/opensvc/bin/stress-ng {env.basedir}/{svcname}/app/eatcpu.bin; cp /data/opensvc/launcher/eatcpu {env.basedir}/{svcname}/app/eatcpu
+info = 10
+monitor = true
+script = {env.basedir}/{svcname}/app/eatcpu
+stop = 90
+start = 10
+optional = true
+check = 10
+restart = 1
+
+[app#2]
+pre_provision = cp /data/opensvc/bin/stress-ng {env.basedir}/{svcname}/app/eatmem.bin; cp /data/opensvc/launcher/eatmem {env.basedir}/{svcname}/app/eatmem
+info = 20
+monitor = true
+script = {env.basedir}/{svcname}/app/eatmem
+stop = 80
+start = 20
+optional = true
+check = 20
+restart = 1
+
+[sync#i0]
+schedule = @1440
+
+[env]
+idx = 1
+basedir = /srv

@@ -1,0 +1,35 @@
+[DEFAULT]
+orchestrate = ha
+nodes = *
+topology = failover
+shared = true
+
+[ip#1]
+type = cni
+netns = container#0
+
+[container#0]
+type = docker
+image = google/pause
+
+[container#1]
+type = docker
+image = registry
+volume_mounts = {svcname}-data/registry:/var/lib/registry
+netns = container#0
+
+[volume#1]
+name = {svcname}-data
+size = {env.size}
+type = freenas
+
+#[volume#2]
+#name = registries-shared-data
+#size = 1g
+#type = loop
+#access = rwx
+#standby = true
+
+[env]
+size = 10g
+

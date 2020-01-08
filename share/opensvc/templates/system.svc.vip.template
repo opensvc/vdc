@@ -1,0 +1,20 @@
+[DEFAULT]
+orchestrate = ha
+nodes = *
+monitor_action = switch
+monitor_schedule = @1m
+
+[sync#i0]
+disable = true
+
+[ip#0]
+ipdev = {env.ipdev}
+ipname = {env.vip}
+netmask = {env.netmask}
+monitor = true
+restart = 1
+
+[env]
+ipdev =
+vip =
+netmask =

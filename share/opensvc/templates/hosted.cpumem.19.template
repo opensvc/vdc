@@ -1,0 +1,76 @@
+[DEFAULT]
+service_type = TST
+monitor_action = freezestop
+nodes = {clusternodes}
+placement = spread
+
+[ip#0]
+ipname = 128.1.1.{env.idx}
+ipdev = lo
+netmask = 32
+
+[disk#0]
+type = loop
+file = {env.basedir}/{svcname}.img
+size = 30m
+standby = true
+
+[disk#1]
+type = lvm
+vgname = {svcname}
+pvs = {disk#0.file}
+standby = true
+
+[fs#0]
+mnt = {env.basedir}/{svcname}
+type = ext3
+dev = /dev/{svcname}/root
+size = 3M
+vg = {svcname}
+standby = true
+
+[fs#1]
+mnt = {env.basedir}/{svcname}/app
+type = ext3
+dev = /dev/{svcname}/app
+size = 10M
+vg = {svcname}
+standby = true
+
+[fs#2]
+mnt = {env.basedir}/{svcname}/data
+type = ext3
+dev = /dev/{svcname}/data
+size = 3M
+vg = {svcname}
+standby = true
+
+[app#1]
+pre_provision = cp /data/opensvc/bin/stress-ng {env.basedir}/{svcname}/app/eatcpu.bin; cp /data/opensvc/launcher/eatcpu {env.basedir}/{svcname}/app/eatcpu
+info = 10
+monitor = true
+script = {env.basedir}/{svcname}/app/eatcpu
+stop = 90
+start = 10
+optional = true
+check = 10
+restart = 1
+
+[app#2]
+pre_provision = cp /data/opensvc/bin/stress-ng {env.basedir}/{svcname}/app/eatmem.bin; cp /data/opensvc/launcher/eatmem {env.basedir}/{svcname}/app/eatmem
+info = 20
+monitor = true
+script = {env.basedir}/{svcname}/app/eatmem
+stop = 80
+start = 20
+optional = true
+check = 20
+restart = 1
+
+[sync#i0]
+schedule = @60
+
+[env]
+idx = 1
+basedir = /dev/shm
+eatmem = 50M

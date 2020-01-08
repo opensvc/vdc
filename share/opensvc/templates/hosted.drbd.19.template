@@ -1,0 +1,43 @@
+[DEFAULT]
+service_type = PRD
+nodes = {clusternodes}
+
+[ip#0]
+ipdev = br-prd
+restart = 1
+dns_update = true
+provisioner = collector
+shared = True
+
+[disk#0]
+type = loop
+file = {env.loopfile}
+standby = true
+
+[disk#1]
+type = lvm
+vgname = {env.drbdvgname}
+pvs = {disk#0.file}
+standby = true
+
+[disk#2]
+type = drbd
+standby = true
+shared = true
+res = {env.drbdresname}
+
+[fs#0]
+mnt = {env.basedir}/{svcname}
+type = ext3
+dev = /dev/{env.drbddev}
+shared = true
+
+[sync#i0]
+schedule = @1440
+
+[env]
+basedir = /srv
+drbddev = drbd10
+drbdvgname = drbdvg
+drbdresname = osvttstdrbd1
+loopfile = /root/loopback.file

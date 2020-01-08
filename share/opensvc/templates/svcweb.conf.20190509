@@ -1,0 +1,15 @@
+[DEFAULT]
+nodes = {clusternodes}
+topology = flex
+orchestrate = ha
+scale = 1 
+
+[ip#1]
+type = cni
+network = weave
+netns = container#1
+
+[container#1]
+type = docker
+image = strm/helloworld-http
+hostname = {svcname}.{nodename}.{namespace}.svc.{clustername}

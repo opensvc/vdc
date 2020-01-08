@@ -1,0 +1,47 @@
+[DEFAULT]
+monitor_action = freezestop
+nodes = {clusternodes}
+cluster_type = flex
+flex_min_nodes = 2
+orchestrate = ha
+
+[ip#0]
+ipname@node1 = 128.1.1.2
+ipname@node2 = 129.1.1.2
+ipdev = lo
+netmask = 32
+
+[disk#0]
+type = loop
+file = {env.basedir}/{svcname}.img
+size = 30m
+
+[disk#1]
+type = lvm
+vgname = {svcname}
+pvs = {disk#0.file}
+
+[fs#0]
+mnt = {env.basedir}/{svcname}
+type = ext3
+dev = /dev/{svcname}/root
+size = 3M
+vg = {svcname}
+
+[fs#1]
+mnt = {env.basedir}/{svcname}/data
+type = ext3
+dev = /dev/{svcname}/data
+size = 20M
+vg = {svcname}
+
+[app#webserver]
+type = simple
+pre_provision = cp /data/opensvc/scripts/webserver.py {env.basedir}/{svcname}/data
+start = {env.basedir}/{svcname}/data/webserver.py
+
+[sync#i0]
+schedule = @1440
+
+[env]
+basedir = /srv

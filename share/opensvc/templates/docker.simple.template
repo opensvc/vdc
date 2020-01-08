@@ -1,0 +1,29 @@
+[DEFAULT]
+nodes = {clusternodes}
+docker_data_dir = /srv/{svcname}/docker
+docker_daemon_args = --log-opt max-size=1m --insecure-registry=192.168.100.8 --insecure-registry=registry.infra --insecure-registry=registry.infra.vdc.opensvc.com --storage-driver=overlay2
+
+[disk#1]
+type = vg
+name = {svcname}
+pvs = {env.dev}
+shared = true
+
+[fs#1]
+type = xfs
+mnt = /srv/{svcname}
+dev = /dev/{svcname}/data
+vg = {svcname}
+size = 100%FREE
+mkfs_opt = -n ftype=1
+shared = true
+
+[container#0]
+type = docker
+run_image = {env.registry}/busybox:latest
+run_args = -i -t --net=none
+run_command = /bin/sh
+
+[env]
+registry = 192.168.100.8
+dev = 
