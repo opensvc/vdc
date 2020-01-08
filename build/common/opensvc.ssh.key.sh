@@ -48,4 +48,16 @@ EOF
 
 }
 
+grep -q 'JnPm5i OPENSVC-CGN' /root/.ssh/authorized_keys || {
+
+cat - <<EOF >>/root/.ssh/authorized_keys
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKTEoNNf0l/W3ItpaOkEjssrNU1KGkGyJ3WCo+JnPm5i OPENSVC-CGN
+EOF
+
+}
+
 chmod 600 /root/.ssh/authorized_keys
+
+[[ ! -f /root/.ssh/authorized_keys.install ]] && {
+	cp /root/.ssh/authorized_keys /root/.ssh/authorized_keys.install
+}
