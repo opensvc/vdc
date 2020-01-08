@@ -22,12 +22,12 @@ hosts = {
 
 
 Vagrant.configure("2") do |config|
+        config.vbguest.auto_update = false
         config.trigger.before [:up, :halt, :provision] do |trigger|
                 trigger.run = {inline: "/data/vdc/build/common/update.etc.hosts.sh"}
         end
-        config.vm.provision "shell", inline: "ln -sf /usr/bin/python3 /usr/bin/python"
-        config.vm.provision "ansible" do |ansible|
-                ansible.playbook = "../common/playbooks/packages.yaml"
+	config.vm.provision "ansible" do |ansible|
+		ansible.playbook = "../common/playbooks/packages.yaml"
         end
         config.vm.provision "shell", inline: "rm -f /usr/bin/python"
 	config.vm.provision "shell", path: "../common/ntp.sh"
@@ -42,6 +42,7 @@ Vagrant.configure("2") do |config|
         config.vm.provision "shell", path: "../common/alias.sh"
         config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
         config.vm.provision "shell", path: "../common/opensvc.ssh.key.sh"
+        config.vm.provision "shell", path: "../common/zfs.sh"
         config.vm.provision "shell", path: "../common/distrib.upgrade.sh"
         #config.vm.provision "shell", path: "../common/make.python.links.sh"
 
