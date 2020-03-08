@@ -16,4 +16,13 @@ test -f /etc/apt/sources.list && {
     sudo /usr/sbin/update-ca-certificates
 }
 
+grep -qi 'CentOS Linux 7' /etc/os-release && {
+	[[ ! -d /opt/openssl ]] && {
+          tar xzf /data/nfspool/openssl.osvc.tar.gz -C /
+          echo "pathmunge /opt/openssl/bin" > /etc/profile.d/openssl.sh
+	  echo "/opt/openssl/lib" > /etc/ld.so.conf.d/openssl-1.1.1c.conf
+	  ldconfig
+        }
+}
+
 exit 0
