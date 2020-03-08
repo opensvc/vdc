@@ -140,3 +140,14 @@ echo vagrant destroy
 # check with vboxmanage --version
 # vboxmanage extpack install --replace Oracle_VM_VirtualBox_Extension_Pack-6.0.12.vbox-extpack
 
+# openssl latest version build centos7
+# sudo yum install libtool perl-core zlib-devel -y
+# curl -O -L https://github.com/openssl/openssl/archive/OpenSSL_1_1_1c.tar.gz
+# tar xzf OpenSSL_1_1_1c.tar.gz -C /opt
+# cd /opt/openssl-OpenSSL_1_1_1c
+# ./config --prefix=/opt/openssl --openssldir=/usr/local/ssl
+# make && make test && make install
+# tar czvf /root/openssl.osvc.tar.gz /opt/openssl /usr/local/ssl
+# echo "pathmunge /opt/openssl/bin" > /etc/profile.d/openssl.sh
+# echo "/opt/openssl/lib" > /etc/ld.so.conf.d/openssl-1.1.1c.conf && ldconfig -v
+
