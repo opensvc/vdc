@@ -43,4 +43,14 @@ EOF
 
 }
 
+# Fix path if needed
+cat - <<EOF > /etc/profile.d/add.bin.sbin.to.path.sh
+if ! echo \${PATH} | grep -qw ':/bin:'; then
+	PATH=\${PATH}:/bin
+fi
+if ! echo \${PATH} | grep -qw ':/sbin:'; then
+	PATH=\${PATH}:/sbin
+fi
+EOF
+
 exit 0
