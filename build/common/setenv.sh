@@ -8,6 +8,7 @@ echo
 echo
 
 ENVFILE=/etc/profile.d/local.sh
+touch ${ENVFILE}
 
 CLUSTER_NUMBER=$(grep -w ^$HOSTNAME /vagrant/vdc.nodes | sort -u | awk '{print $2}')
 
