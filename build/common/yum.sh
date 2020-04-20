@@ -29,7 +29,7 @@ MAJOR_VERSION=$(grep ^VERSION_ID /etc/os-release | awk -F= '{print $2}' | sed -e
 # yum
 sudo yum-config-manager -q --disable CentOS\* CentOS-8\* epel\*
 sudo mkdir /root/yum.repos.d
-sudo mv /etc/yum.repos.d/CentOS* /etc/yum.repos.d/epel* /root/yum.repos.d/
+sudo mv /etc/yum.repos.d/CentOS* /etc/yum.repos.d/epel* /root/yum.repos.d/ 2>/dev/null
 
 [[ ${MAJOR_VERSION} -eq 7 ]] && {
     sudo yum-config-manager -q --add-repo file:///mnt/repos/centos/${MAJOR_VERSION}/base
