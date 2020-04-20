@@ -10,6 +10,7 @@ echo
 [[ -f /etc/debian_version ]] && {
 	DEBIAN_FRONTEND=noninteractive apt update
         DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confmiss" dist-upgrade
+        DEBIAN_FRONTEND=noninteractive apt -y autoremove
 }
 
 [[ -f /etc/redhat-release ]] && {
