@@ -7,7 +7,7 @@ echo "########################"
 echo
 echo
 
-ENVFILE=/etc/profile.d/sh.local
+ENVFILE=/etc/profile.d/local.sh
 
 CLUSTER_NUMBER=$(grep -w ^$HOSTNAME /vagrant/vdc.nodes | sort -u | awk '{print $2}')
 
@@ -39,6 +39,11 @@ export OSVC_SVC6_NAME=c${CLUSTER_NUMBER}svc6
 export OSVC_SVC7_NAME=c${CLUSTER_NUMBER}svc7
 export OSVC_SVC8_NAME=c${CLUSTER_NUMBER}svc8
 export OSVC_SVC9_NAME=c${CLUSTER_NUMBER}svc9
+export OSVC_SVC10_NAME=c${CLUSTER_NUMBER}svc10
+export OSVC_SVC11_NAME=c${CLUSTER_NUMBER}svc11
+export OSVC_SVC12_NAME=c${CLUSTER_NUMBER}svc12
+export OSVC_SVC13_NAME=c${CLUSTER_NUMBER}svc13
+export OSVC_SVC14_NAME=c${CLUSTER_NUMBER}svc14
 EOF
 
 }
