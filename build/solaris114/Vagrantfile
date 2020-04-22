@@ -1,0 +1,89 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'yaml'
+
+current_dir    = File.dirname(File.expand_path(__FILE__))
+configs        = YAML.load_file("#{current_dir}/../vagrant.osvc.config.yaml")
+vagrant_config = configs['configs'][configs['configs']['use']]
+
+hosts = {
+	"sol114-1" => {
+		"memory" => 3072,
+		"cluster" => "22",
+                "sshexpose" => 22211
+	},
+	"sol114-2" => {
+		"memory" => 2048,
+		"cluster" => "22",
+                "sshexpose" => 22212
+        }	
+}
+
+
+Vagrant.configure("2") do |config|
+
+        config.trigger.before [:up, :halt, :provision] do |trigger|
+                trigger.run = {inline: "/data/vdc/build/common/update.etc.hosts.sh"}
+        end
+        config.vm.synced_folder ".", "/vagrant", disable: false
+        config.vm.provision "ansible" do |ansible|
+                ansible.playbook = "../common/playbooks/packages.yaml"
+                #ansible.verbose = "vvv"
+        end
+	config.vm.provision "shell", path: "../common/solaris/install.guest.additions.sh"
+	config.vm.provision "shell", path: "../common/solaris/net.sh"
+	config.vm.provision "shell", path: "../common/solaris/system.sh"
+	config.vm.provision "shell", path: "../common/solaris/svcs.sh"
+        config.vm.provision "shell", path: "../common/solaris/autofs.sh", env: {"VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
+	config.vm.provision "shell", path: "../common/solaris/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
+	config.vm.provision "shell", path: "../common/solaris/auto-clear-smf.sh"
+	#config.vm.provision "shell", path: "../common/fix.ubuntu.dns.sh"
+	#config.vm.provision "shell", path: "../common/net.sh"
+        #config.vm.provision "shell", path: "../common/autofs.sh", env: {"VDCBOXIP" => vagrant_config['vdcboxip'], "VDCBOXEXPORT" => vagrant_config['vdcboxexport'], "VMNFSROOT" => vagrant_config['vmnfsroot'], "VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
+        #config.vm.provision "shell", path: "../common/ssh.sh"
+	#config.vm.provision "shell", path: "../common/md.sh"
+	#config.vm.provision "shell", path: "../common/docker.sh"
+	#config.vm.provision "shell", path: "../common/lvm.sh"
+        #config.vm.provision "shell", path: "../common/user.sh"
+        #config.vm.provision "shell", path: "../common/alias.sh"
+        #config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
+        #config.vm.provision "shell", path: "../common/qabot.ssh.key.sh"
+        #config.vm.provision "shell", path: "../common/distrib.upgrade.sh"
+
+	hosts.each do |name, desc|
+		config.vm.define name do |machine|
+			machine.vm.box = "opensvc/solaris114"
+			machine.vm.hostname = "%s" % name
+                        machine.vm.network "private_network", :type => 'dhcp', :name => 'vboxnet0', :adapter => 2
+                        machine.vm.network "public_network", bridge: "br-%s-0" % desc["cluster"], auto_config: false
+                        machine.vm.network "public_network", bridge: "br-%s-1" % desc["cluster"], auto_config: false
+                        machine.vm.network "public_network", bridge: "br-%s-2" % desc["cluster"], auto_config: false
+                        machine.vm.network "forwarded_port", guest: 22, host: desc["sshexpose"], id: "ssh"
+                        machine.vm.provider "virtualbox" do |v|
+                                v.memory = desc["memory"]
+                                v.name = "%s" % name
+                                v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+                                v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+                                v.customize ["modifyvm", :id, "--audio", "none"]
+
+				# connect from hypervisor using nc -U termb.sol114-2.sock
+				# Need enable console service in Solaris guest: svcadm enable console-login:terma console-login:termb
+				v.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
+				v.customize ["modifyvm", :id, "--uartmode1", "server", "/data/vdc/build/solaris114/terma.#{name}.sock"]
+				v.customize ["modifyvm", :id, "--uart2", "0x2F8", "3"]
+				v.customize ["modifyvm", :id, "--uartmode2", "server", "/data/vdc/build/solaris114/termb.#{name}.sock"]
+
+                                #v.customize ["setproperty", "vrdeauthlibrary", "VboxAuth"]
+                                v.customize ["modifyvm", :id, "--vrde", "on"]
+                                vrdpexpose = desc["sshexpose"] + 1000
+                                v.customize ["modifyvm", :id, "--vrdeport", vrdpexpose]
+                                v.customize ["modifyvm", :id, "--vrdeaddress", "0.0.0.0"]
+                                v.customize ['storageattach', :id, '--storagectl', 'IDE Controller', '--port', 1, '--device', 0, '--type', 'dvddrive', '--medium', 'emptydrive']
+                                #v.customize ["modifyvm", :id, "--vrdeauthtype", "external"]
+                                #v.customize ["setextradata", :id, "VBoxAuthSimple/users/console", vagrant_config['vrdppasswdhash']]
+                        end
+
+		end
+	end
+end
