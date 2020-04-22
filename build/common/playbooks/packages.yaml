@@ -71,6 +71,7 @@
         - python3-crypto
         - python3-cryptography
         - python3-requests
+        - python3-venv
         - sg3-utils
     when: (ansible_facts['distribution'] == "Ubuntu" ) or
           (ansible_facts['distribution'] == "Debian" )
