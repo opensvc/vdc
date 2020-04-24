@@ -170,7 +170,7 @@
         - autofs
         - bind-utils
         - device-mapper-multipath
-        - docker
+        - podman
         - iscsi-initiator-utils
         - python36
         - python3-requests
