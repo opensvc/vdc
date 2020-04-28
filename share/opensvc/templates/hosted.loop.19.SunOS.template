@@ -1,0 +1,138 @@
+[DEFAULT]
+service_type = TST
+monitor_action = freezestop
+nodes = {clusternodes}
+id = 17dcf473-e03e-41e5-8478-91ed4f4e7cf3
+
+[subset#app:02webservers]
+parallel = true
+
+[ip#0]
+ipname = 128.1.1.{env.idx}
+ipdev = {env.loopback_nic}
+netmask = 16
+shared = true
+
+[disk#0]
+type = loop
+file = {env.basedir}/{svcname}.img
+size = 64m
+standby = true
+
+[disk#1]
+type = zpool
+name = {svcname}
+vdev = {disk#0.file}
+standby = true
+
+[subset#app:01appservers]
+parallel = false
+
+[fs#0]
+mnt = {env.basedir}/{svcname}
+type = {env.fs_type}
+dev = {env.dev_basedir}{svcname}/root
+size = 3M
+standby = true
+
+[fs#1]
+mnt = {env.basedir}/{svcname}/app
+type = {env.fs_type}
+dev = {env.dev_basedir}{svcname}/app
+size = 3M
+standby = true
+
+[fs#2]
+mnt = {env.basedir}/{svcname}/data
+type = {env.fs_type}
+dev = {env.dev_basedir}{svcname}/data
+size = 3M
+standby = true
+
+[app#1]
+pre_provision = cp /data/opensvc/launcher/app {env.basedir}/{svcname}/app/dblauncher
+info = 10
+subset = 00database
+monitor = false
+script = {env.basedir}/{svcname}/app/dblauncher
+tags = groupdb
+stop = 90
+start = 10
+optional = true
+check = 10
+
+[app#2]
+pre_provision = cp /data/opensvc/launcher/app {env.basedir}/{svcname}/app/applauncher1
+info = 20
+subset = 01appservers
+script = {env.basedir}/{svcname}/app/applauncher1
+tags = groupapp
+stop = 80
+start = 20
+optional = true
+check = 20
+
+[app#3]
+pre_provision = cp /data/opensvc/launcher/app {env.basedir}/{svcname}/app/applauncher2
+info = 20
+subset = 01appservers
+script = {env.basedir}/{svcname}/app/applauncher2
+tags = groupapp
+stop = 80
+start = 20
+optional = true
+check = 20
+
+[app#4]
+info = 30
+pre_provision = cp /data/opensvc/launcher/app {env.basedir}/{svcname}/app/weblauncher1
+subset = 02webservers
+script = {env.basedir}/{svcname}/app/weblauncher1
+tags = groupweb
+stop = 70
+start = 30
+optional = true
+check = 30
+
+[app#5]
+pre_provision = cp /data/opensvc/launcher/app {env.basedir}/{svcname}/app/weblauncher2
+info = 30
+subset = 02webservers
+script = {env.basedir}/{svcname}/app/weblauncher2
+tags = groupweb
+stop = 70
+start = 30
+optional = true
+check = 30
+
+[app#6]
+pre_provision = cp /data/opensvc/launcher/app {env.basedir}/{svcname}/app/weblauncher3
+info = 30
+subset = 02webservers
+script = {env.basedir}/{svcname}/app/weblauncher3
+tags = groupweb
+stop = 70
+start = 30
+optional = true
+check = 30
+
+[app#7]
+pre_provision = cp /data/opensvc/launcher/app {env.basedir}/{svcname}/app/weblauncher4
+info = 30
+subset = 02webservers
+script = {env.basedir}/{svcname}/app/weblauncher4
+tags = groupweb
+stop = 70
+start = 30
+optional = true
+check = 30
+restart = 1
+
+[env]
+idx = 1
+basedir = /system/volatile
+dev_basedir =
+loopback_nic = lo0
+disktype = zpool
+fs_type = zfs
+
