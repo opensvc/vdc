@@ -133,6 +133,5 @@ idx = 1
 basedir = /system/volatile
 dev_basedir =
 loopback_nic = lo0
-disktype = zpool
 fs_type = zfs
 
