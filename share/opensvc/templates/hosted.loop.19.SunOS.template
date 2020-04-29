@@ -15,13 +15,13 @@ shared = true
 
 [disk#0]
 type = loop
-file = {env.basedir}/{svcname}.img
+file = /loop-{svcname}.loopfile
 size = 64m
 standby = true
 
 [disk#1]
 type = zpool
-name = {svcname}
+name = {env.disk_groupname}
 vdev = {disk#0.file}
 standby = true
 
@@ -31,21 +31,21 @@ parallel = false
 [fs#0]
 mnt = {env.basedir}/{svcname}
 type = {env.fs_type}
-dev = {env.dev_basedir}{svcname}/root
+dev = {env.dev_basedir}{env.disk_groupname}/root
 size = 3M
 standby = true
 
 [fs#1]
 mnt = {env.basedir}/{svcname}/app
 type = {env.fs_type}
-dev = {env.dev_basedir}{svcname}/app
+dev = {env.dev_basedir}{env.disk_groupname}/app
 size = 3M
 standby = true
 
 [fs#2]
 mnt = {env.basedir}/{svcname}/data
 type = {env.fs_type}
-dev = {env.dev_basedir}{svcname}/data
+dev = {env.dev_basedir}{env.disk_groupname}/data
 size = 3M
 standby = true
 
@@ -130,8 +130,8 @@ restart = 1
 
 [env]
 idx = 1
-basedir = /system/volatile
+basedir = /qa-tmp
 dev_basedir =
 loopback_nic = lo0
 fs_type = zfs
-
+disk_groupname = data-{svcname}
