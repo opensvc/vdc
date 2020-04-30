@@ -29,7 +29,7 @@ parallel = false
 
 [fs#0]
 mnt = {env.basedir}/{svcname}
-type = {env.fs_type}
+type = ext3
 dev = {env.dev_basedir}{svcname}/root
 size = 3M
 vg = {svcname}
@@ -37,7 +37,7 @@ standby = true
 
 [fs#1]
 mnt = {env.basedir}/{svcname}/app
-type = {env.fs_type}
+type = ext3
 dev = {env.dev_basedir}{svcname}/app
 size = 3M
 vg = {svcname}
@@ -45,7 +45,7 @@ standby = true
 
 [fs#2]
 mnt = {env.basedir}/{svcname}/data
-type = {env.fs_type}
+type = ext3
 dev = {env.dev_basedir}{svcname}/data
 size = 3M
 vg = {svcname}

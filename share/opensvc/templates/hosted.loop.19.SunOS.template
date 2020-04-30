@@ -30,21 +30,21 @@ parallel = false
 
 [fs#0]
 mnt = {env.basedir}/{svcname}
-type = {env.fs_type}
+type = zfs
 dev = {env.dev_basedir}{env.disk_groupname}/root
 size = 3M
 standby = true
 
 [fs#1]
 mnt = {env.basedir}/{svcname}/app
-type = {env.fs_type}
+type = zfs
 dev = {env.dev_basedir}{env.disk_groupname}/app
 size = 3M
 standby = true
 
 [fs#2]
 mnt = {env.basedir}/{svcname}/data
-type = {env.fs_type}
+type = zfs
 dev = {env.dev_basedir}{env.disk_groupname}/data
 size = 3M
 standby = true
