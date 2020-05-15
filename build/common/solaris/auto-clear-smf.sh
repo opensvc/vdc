@@ -1,4 +1,10 @@
-#!/bin/ksh -p
+#!/bin/bash
+
+echo "################################"
+echo "######## AUTO CLEAR SMF ########"
+echo "################################"
+
+[[ -f ~vagrant/opensvc-qa.sh ]] && . ~vagrant/opensvc-qa.sh
 
 echo "Install custom opensvc-clear-smf to clear /lib/svc/method/fs-local transiant failure during boot"
 echo "Because /export/home/vagrant may be busy"
@@ -60,4 +66,5 @@ EOF
 
 svccfg import /tmp/opensvc-clear-smf.xml
 
-
+echo
+echo "End of auto clear smf"
