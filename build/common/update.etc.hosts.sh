@@ -16,6 +16,10 @@ while [[ $idx -lt $VDC_CLUSTER_IDX ]]
 do
     #ipstring="$ipstring,$netA.$idx.$cpt.1/24"
     subnets["${VDC_SUBNET_A}.${idx}.0"]=""
+    if (( $idx == 0 )); then
+            let idx=$idx+1
+	    continue
+    fi
     subnets["${VDC_SUBNET_A}.${idx}.1"]="-hb1"
     subnets["${VDC_SUBNET_A}.${idx}.2"]="-hb2"
     let idx=$idx+1
@@ -66,14 +70,15 @@ clean_hosts
 gen_data > /data/vdc/share/vdc.nodes.hosts
 cat /data/vdc/share/vdc.nodes.hosts >> /etc/hosts
 
-distribute_data
+# now distributed by ansible bootstrap playbook
+# distribute_data
 
 OLDSUM=$(md5sum /etc/hosts.$TIMESTAMP | awk '{print $1}')
 NEWSUM=$(md5sum /etc/hosts | awk '{print $1}')
 
 [[ $OLDSUM != $NEWSUM ]] && {
-    echo "Changes detected, restarting systemd-resolved"
-    systemctl restart systemd-resolved.service
+    echo "Changes detected, restarting dnsmasq"
+    systemctl restart dnsmasq.service
 }
 
 exit 0
