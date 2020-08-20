@@ -6,6 +6,8 @@ echo "######## ISCSI ########"
 echo "#######################"
 echo
 
+[[ -f ~vagrant/opensvc-qa.sh ]] && . ~vagrant/opensvc-qa.sh
+
 [[ -z ${ISCSITGTIP} ]] && {
     echo "Error : ISCSITGTIP not found in environment"
     exit 1
@@ -19,8 +21,22 @@ ping -q -w 1 ${ISCSITGTIP} >> /dev/null 2>&1 || {
 echo "Creating /etc/multipath.conf"
 cat - <<EOF >|/etc/multipath.conf
 defaults {
-	user_friendly_names no
-	find_multipaths yes
+        find_multipaths yes
+        user_friendly_names no
+}
+
+blacklist {
+        devnode "^drbd[0-9]"
+        device {
+                vendor "VBOX"
+        }
+}
+
+blacklist_exceptions {
+        device {
+                vendor "FreeNAS"
+                product "iSCSI Disk"
+        }
 }
 EOF
 
