@@ -10,77 +10,77 @@ vagrant_config = configs['configs'][configs['configs']['use']]
 
 hosts = {
 	"c1n1" => {
-		"memory" => 512,
+		"memory" => 1024,
 		"cluster" => "1",
                 "sshexpose" => 20111
 	},
 	"c1n2" => {
-		"memory" => 512,
+		"memory" => 1024,
 		"cluster" => "1",
                 "sshexpose" => 20112
 	},
 	"c1n3" => {
-		"memory" => 512,
+		"memory" => 2048,
 		"cluster" => "1",
                 "sshexpose" => 20113
 	},
 	"c2n1" => {
-		"memory" => 512,
+		"memory" => 1024,
 		"cluster" => "2",
                 "sshexpose" => 20211
 	},
 	"c2n2" => {
-		"memory" => 512,
+		"memory" => 1024,
 		"cluster" => "2",
                 "sshexpose" => 20212
 	},
 	"c2n3" => {
-		"memory" => 512,
+		"memory" => 2048,
 		"cluster" => "2",
                 "sshexpose" => 20213
 	},
 	"c3n1" => {
-		"memory" => 512,
+		"memory" => 1024,
 		"cluster" => "3",
                 "sshexpose" => 20311
 	},
 	"c3n2" => {
-		"memory" => 512,
+		"memory" => 1024,
 		"cluster" => "3",
                 "sshexpose" => 20312
 	},
 	"c3n3" => {
-		"memory" => 512,
+		"memory" => 2048,
 		"cluster" => "3",
                 "sshexpose" => 20313
 	},
 	"c4n1" => {
-		"memory" => 512,
+		"memory" => 1024,
 		"cluster" => "4",
                 "sshexpose" => 20411
 	},
 	"c4n2" => {
-		"memory" => 512,
+		"memory" => 1024,
 		"cluster" => "4",
                 "sshexpose" => 20412
 	},
 	"c4n3" => {
-		"memory" => 512,
+		"memory" => 2048,
 		"cluster" => "4",
                 "sshexpose" => 20413
 	},
 	"c5n1" => {
-		"memory" => 512,
+		"memory" => 1024,
 		"cluster" => "5",
                 "sshexpose" => 20511
 	},
 	"c5n2" => {
-		"memory" => 512,
+		"memory" => 1024,
 		"cluster" => "5",
                 "sshexpose" => 20512
 	},
 	"c5n3" => {
-		"memory" => 512,
+		"memory" => 2048,
 		"cluster" => "5",
                 "sshexpose" => 20513
 	},
@@ -95,7 +95,7 @@ hosts = {
                 "sshexpose" => 20612
 	},
 	"c6n3" => {
-		"memory" => 512,
+		"memory" => 2048,
 		"cluster" => "6",
                 "sshexpose" => 20613
 	},
@@ -155,41 +155,51 @@ hosts = {
                 "sshexpose" => 21012
 	},
 	"c10n3" => {
-		"memory" => 512,
+		"memory" => 2048,
 		"cluster" => "10",
                 "sshexpose" => 21013
 	}
 }
 
 Vagrant.configure("2") do |config|
-        config.vbguest.auto_update = false
+        # config.vbguest.auto_update = false
         config.trigger.before [:up, :halt, :provision] do |trigger|
-                trigger.run = {inline: "../common/update.etc.hosts.sh"}
+                trigger.run = {inline: "/data/vdc/build/common/update.etc.hosts.sh"}
         end
-	config.vm.provision "ansible" do |ansible|
-		ansible.playbook = "../common/playbooks/packages.yaml"
+        config.trigger.after :after_boot, type: :hook do |trigger|
+                trigger.info = "After Boot : Generating nic map"
+                trigger.run = {inline: "/data/vdc/build/common/vbox.provision.trigger.sh"}
         end
-        config.vm.provision "shell", path: "../common/ntp.sh"
-        config.vm.provision "shell", path: "../common/net.sh"
-        config.vm.provision "shell", path: "../common/setenv.sh"
-        config.vm.provision "shell", path: "../common/yum.sh"
-        config.vm.provision "shell", path: "../common/autofs.sh", env: {"VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
-	config.vm.provision "shell", path: "../common/ssh.sh"
-	config.vm.provision "shell", path: "../common/md.sh"
-        config.vm.provision "shell", path: "../common/docker.sh"
-	config.vm.provision "shell", path: "../common/lvm.sh"
-	config.vm.provision "shell", path: "../common/user.sh", env: {"VAGRANTPASSWDBASE64HASH" => vagrant_config['vagrantpasswdbase64hash']}
-	config.vm.provision "shell", path: "../common/alias.sh"
-	config.vm.provision "shell", path: "../common/selinux.sh"
-	config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
-	config.vm.provision "shell", path: "../common/opensvc.ssh.key.sh"
-        config.vm.provision "shell", path: "../common/distrib.upgrade.sh"
-        config.vm.provision "shell", path: "../common/ssl.sh"
+        config.vm.provision "ansible" do |ansible|
+                ansible.playbook = "../common/playbooks/bootstrap.yml"
+                #ansible.verbose = "vv"
+                ansible.extra_vars = {
+                  osvc_vagprj: current_dir
+                }
+        end
 
+	config.vm.provision "shell", path: "../common/ntp.sh"
+	config.vm.provision "shell", path: "../common/net-netplan.sh"
+        config.vm.provision "shell", path: "../common/autofs.sh", env: {"VMAUTOFSROOT" => vagrant_config['vmautofsroot'], "VMAUTOFSKEY" => vagrant_config['vmautofskey']}
+        config.vm.provision "shell", path: "../common/ssh.sh"
+	config.vm.provision "shell", path: "../common/md.sh"
+	config.vm.provision "shell", path: "../common/docker.sh"
+	config.vm.provision "shell", path: "../common/lvm.sh"
+        config.vm.provision "shell", path: "../common/user.sh", env: {"VAGRANTPASSWDBASE64HASH" => vagrant_config['vagrantpasswdbase64hash']}
+        config.vm.provision "shell", path: "../common/alias.sh"
+        config.vm.provision "shell", path: "../common/iscsi.sh", env: {"ISCSITGTIP" => vagrant_config['iscsitgtip']}
+        config.vm.provision "shell", path: "../common/opensvc.ssh.key.sh"
+        config.vm.provision "shell", path: "../common/zfs.sh"
+        config.vm.provision "shell", path: "../common/ssl.sh"
+        config.vm.provision "shell", path: "../common/setenv.sh"
+        config.vm.provision "shell", path: "../common/lxc.sh"
+        config.vm.provision "shell", path: "../common/drbd.sh"
+        config.vm.provision "shell", path: "../common/gendarmerie.sh"
+        config.vm.provision "shell", path: "../common/distrib.upgrade.sh"
 
 	hosts.each do |name, desc|
 		config.vm.define name do |machine|
-			machine.vm.box = "bento/centos-7"
+			machine.vm.box = "bento/ubuntu-20.04"
 			machine.vm.hostname = "%s" % name
                         machine.vm.network "private_network", :type => 'dhcp', :name => 'vboxnet0', :adapter => 2
                         machine.vm.network "public_network", bridge: "br-%s-0" % desc["cluster"], auto_config: false
@@ -200,18 +210,39 @@ Vagrant.configure("2") do |config|
                                 v.linked_clone = true
                                 v.memory = desc["memory"]
                                 v.name = "%s" % name
-                                v.customize ["modifyvm", :id, "--macaddress1", "auto"]
+                                macaddress = sprintf("08002700%02d%s", desc["cluster"], desc["sshexpose"].to_s[-2..-1])
+                                v.customize ["modifyvm", :id, "--macaddress1", macaddress]
                                 v.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
                                 v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
                                 v.customize ["modifyvm", :id, "--audio", "none"]
-                                #v.customize ["setproperty", "vrdeauthlibrary", "null"]
+                                v.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
+                                #v.customize ["setproperty", "vrdeauthlibrary", "VboxAuth"]
                                 v.customize ["modifyvm", :id, "--vrde", "on"]
                                 vrdpexpose = desc["sshexpose"] + 1000
                                 v.customize ["modifyvm", :id, "--vrdeport", vrdpexpose]
                                 v.customize ["modifyvm", :id, "--vrdeaddress", "0.0.0.0"]
                                 #v.customize ["modifyvm", :id, "--vrdeauthtype", "external"]
                                 #v.customize ["setextradata", :id, "VBoxAuthSimple/users/console", vagrant_config['vrdppasswdhash']]
+                                # storage
+                                provflag = sprintf("/data/vdc/build/lab/.vagrant/machines/%s/virtualbox/action_provision",name)
+                                if ! File.exist?(provflag)
+                                        v.customize ["storagectl", :id, "--name", "SCSI", "--add", "scsi"]
+                                end
+                                drives = [0,1,2,3,4,5]
+                                drives.each do |lun|
+                                        devicenum = sprintf("%d%d",desc["cluster"],lun)
+                                        disk = sprintf("/data/vdc/vagrant_home/disks/c%d.scsi.lun.%d.vdi",desc["cluster"],lun)
+                                        #puts "#{devicenum}"
+                                        #puts "#{disk}"
+                                        #res = File.exist?(disk)
+                                        #puts "#{res}"
+                                        unless File.exist?(disk)
+                                                v.customize ['createmedium', '--filename', disk,'--variant', 'Fixed', '--size', 512]
+                                        end
+                                        v.customize ['storageattach', :id,  '--storagectl', 'SCSI', '--type', 'hdd', '--port', lun, '--mtype', 'shareable', '--medium', disk, '--nonrotational', 'on']  
+                                end
 			end
+
 		end
 	end
 end
