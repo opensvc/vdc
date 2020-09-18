@@ -29,6 +29,7 @@ blacklist {
         devnode "^drbd[0-9]"
         device {
                 vendor "VBOX"
+                product "HARDDISK"
         }
 }
 
