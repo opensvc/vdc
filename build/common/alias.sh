@@ -6,6 +6,8 @@ echo "######## ALIAS ########"
 echo "#######################"
 echo 
 
+[[ -f ~vagrant/opensvc-qa.sh ]] && . ~vagrant/opensvc-qa.sh
+
 echo "Creating /etc/profile.d/opensvc.alias.sh"
 cat - <<EOF >>/etc/profile.d/opensvc.alias.sh
 
