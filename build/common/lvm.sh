@@ -7,6 +7,7 @@ echo "#####################"
 echo
 
 set -a
+[[ -f ~vagrant/opensvc-qa.sh ]] && . ~vagrant/opensvc-qa.sh
 
 ROOTVG=$(lvs --noheadings -o name,vg_name | grep -w root | awk '{print $2}')
 
