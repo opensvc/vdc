@@ -13,4 +13,9 @@ echo
         timedatectl
 }
 
+[[ -x /usr/sbin/ntpdate ]] && {
+	echo "Sync time with ntpdate"
+	/usr/sbin/ntpdate -s time.chronos.fr
+}
+
 exit 0
