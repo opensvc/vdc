@@ -67,14 +67,28 @@
         - ntp
         - python-crypto
         - python-cryptography
-        - python-requests
         - python3-crypto
         - python3-cryptography
         - python3-requests
         - python3-venv
         - sg3-utils
+        - virtualenv
+        - xfsprogs
     when: (ansible_facts['distribution'] == "Ubuntu" ) or
           (ansible_facts['distribution'] == "Debian" )
+
+  - name: install common packages for ubuntu/deb
+    apt:
+      name:  "{{ packages }}"
+      state: present
+    vars:
+      packages:
+        - python-crypto
+        - python-cryptography
+        - python-requests
+    when: (ansible_facts['distribution'] == "Ubuntu" ) and
+          ansible_distribution_major_version|int < 20
+
 
   - name: check version integer
     debug: msg="ansible_distribution_major_version {{ ansible_distribution_major_version|int }} as an integer"
@@ -191,25 +205,3 @@
     - htop
     - jq
     when: (ansible_facts['system'] == "Linux" )
-
-  - name: install Solaris ips packages
-    pkg5:
-      name:
-        - developer/versioning/git
-        - web/browser/links
-        - runtime/python-35
-        - library/python/requests-35
-        - library/python/cryptography-35
-        - library/python/virtualenv
-        - library/python/virtualenv-35
-        - library/python/virtualenv-27
-        - text/jq
-    when: ansible_facts['distribution'] == "Solaris"
-
-  - name: update local pkg catalog
-    command: /opt/csw/bin/pkgutil -U
-    when: ansible_facts['distribution'] == "Solaris"
-
-  - name: install CSWlsof
-    command: /opt/csw/bin/pkgutil -y -i lsof
-    when: ansible_facts['distribution'] == "Solaris"
