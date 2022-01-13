@@ -6,7 +6,17 @@ echo "######## MD ########"
 echo "####################"
 echo
 
-grep -q '^AUTO -all' /etc/mdadm.conf 2>/dev/null || {
-    echo "Populating /etc/mdadm.conf with AUTO -all"
-    echo "AUTO -all" >>/etc/mdadm.conf
-}
+[[ -f ~vagrant/opensvc-qa.sh ]] && . ~vagrant/opensvc-qa.sh
+
+for file in /etc/mdadm.conf /etc/mdadm/mdadm.conf
+do
+  test -f $file && {
+      echo "File $file is found"
+      grep -q '^AUTO -all' $file 2>/dev/null || {
+          echo "Populating $file  with AUTO -all"
+          echo "AUTO -all" >> $file
+      }
+  }
+done
+
+exit 0
