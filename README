@@ -79,10 +79,10 @@ echo sudo apt install yum-utils createrepo
     echo sudo reposync --config=/data/vdc/share/repos/yum/yum.7.conf --plugins --repoid=updates \
       --newest-only --delete --downloadcomps --download-metadata \
       --download_path=/data/vdc/share/repos/centos/7/
-    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.7.conf --plugins --repoid=epel \
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.7.conf --plugins --repoid=epel7 \
       --newest-only --delete --downloadcomps --download-metadata \
       --download_path=/data/vdc/share/repos/epel/7/
-    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.7.conf --plugins --repoid=elrepo \
+    echo sudo reposync --config=/data/vdc/share/repos/yum/yum.7.conf --plugins --repoid=elrepo7 \
       --newest-only --delete --downloadcomps --download-metadata \
       --download_path=/data/vdc/share/repos/elrepo/7
     echo sudo createrepo /data/vdc/share/repos/centos/7/base/ -g comps.xml
