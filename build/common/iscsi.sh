@@ -42,7 +42,9 @@ blacklist_exceptions {
 EOF
 
 echo "Restarting multipathd systemd unit"
-sudo systemctl start multipathd.service
+sudo multipath -F
+sudo systemctl enable multipathd.service
+sudo systemctl restart multipathd.service
 
 echo "Creating /etc/iscsi/initiatorname.iscsi"
 cat - <<EOF >|/etc/iscsi/initiatorname.iscsi
@@ -51,6 +53,11 @@ EOF
 
 echo "Enabling automatic restart at boot"
 sed -i 's/^node.startup.*$/node.startup = automatic/' /etc/iscsi/iscsid.conf
+
+sudo systemctl -q is-active iscsi.service || {
+    sudo systemctl enable --now iscsi.service
+    sudo systemctl start iscsi.service
+}
 
 sudo iscsiadm -m discovery -t st -p $ISCSITGTIP && {
 
