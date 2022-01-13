@@ -24,3 +24,5 @@ share/opensvc/deb/*.*
 share/opensvc/demo/python.buster.docker.image.tar
 share/opensvc/pyconfr/python.buster.docker.image.tar
 build/*/labdemo-volatile/
+share/solaris/repo/
+share/solaris/repo-solarisstudio/
