@@ -6,6 +6,9 @@ echo "######## SSL ########"
 echo "#####################"
 echo
 
+[[ -f ~vagrant/opensvc-qa.sh ]] && . ~vagrant/opensvc-qa.sh
+
+
 [[ -f /etc/redhat-release ]] && {
     sudo cp /data/opensvc/ssl/rapidssl.pem /etc/pki/ca-trust/source/anchors
     sudo /usr/bin/update-ca-trust
