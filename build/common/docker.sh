@@ -6,6 +6,7 @@ echo "######## DOCKER ########"
 echo "########################"
 echo
 
+[[ -f ~vagrant/opensvc-qa.sh ]] && . ~vagrant/opensvc-qa.sh
 
 # bugfixes
 
@@ -26,7 +27,8 @@ echo
     [[ ! -d /etc/systemd/system/docker.service.d ]] && {
         echo "disable dockerd iptables"
         sudo mkdir -p /etc/systemd/system/docker.service.d
-        echo -e "[Service]\nExecStart=\nExecStart=/usr/bin/dockerd -H fd:// --iptables=false" | sudo tee /etc/systemd/system/docker.service.d/disable-iptables.conf
+        dockerd=$(which dockerd)
+        echo -e "[Service]\nExecStart=\nExecStart=${dockerd} -H fd:// --iptables=false" | sudo tee /etc/systemd/system/docker.service.d/disable-iptables.conf
     }
 }
 
@@ -40,10 +42,12 @@ sudo systemctl restart docker.service
 
 # install cni
 
-[[ ! -d /opt/cni/bin ]] && {
-    [[ -x /data/cni/cni.sh ]] && {
-        echo "Installing CNI"
-	/data/cni/cni.sh
+[[ ! -f /usr/lib/cni/bridge ]] && {
+    [[ ! -d /opt/cni/bin ]] && {
+        [[ -x /data/cni/cni.sh ]] && {
+            echo "Installing CNI from /data/cni/cni.sh"
+	    /data/cni/cni.sh
+        }
     }
 }
 
